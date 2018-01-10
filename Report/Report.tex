@@ -1,0 +1,206 @@
+\documentclass{article}
+\usepackage{graphicx}
+\usepackage[nottoc,numbib]{tocbibind}
+\usepackage[a4paper, total={6in, 8in}]{geometry}
+\usepackage{subcaption}
+\newcommand{\myparagraph}[1]{\paragraph{#1}\mbox{}\\}
+ 
+\usepackage{xcolor}
+\newcommand{\highlight}[1]{\colorbox{yellow!50}{$\displaystyle#1$}}
+
+
+\title{Evolutionary Computation}
+\author{Y1481702}
+\date{\today}
+\setlength\parindent{0pt}
+ 
+\begin{document}
+%FONT MUST BE SIZE 12 ARIAL.
+%Margin must be MIN 2cm
+
+\begin{titlepage}
+\maketitle
+\tableofcontents
+\end{titlepage}
+
+% Submit Code, 5 marks
+% Must be a 'good final solution' and run on a test set
+
+\section{Abstract} %Unmarked
+
+
+% 15 marks
+\section{Introduction} 
+% Well written and clear 
+% Connects well with the literature and provides relevant references
+% Demonstates synthesis of the literature
+% Demonstates critical ability
+% Makes the problem and challenges clear
+% Highlights the approach that will be used and justifies it
+
+
+\subsection{Background}
+Biomimicry, the imitation of nature for solving human problems has produced many examples of world class design. 
+Some great examples of Biomimicry are Velcro(R), self-cleaning paints and Shinkansen high-speed trains\cite{biomimicry}. In particular these examples imitate the form of nature's physical systems. Since the term biomimicry was first coined in 1997, this design philosophy has started to inspire new developments in various subjects such as the circular economy in product design[CITE] as well as several pieces of ongoing work in Computer Science such as self-driving cars[CITE].
+%TALK ABOUT THE BENEFITS OF BIOMIMICRY
+Life has been around on earth for 3.8 billion years, this is a lot of R\&D time to produce useful solutions which can be related to many of the current problems in various fields[CITE, VOX video].
+
+Clearly Evolutionary Computation is an optimisation process inspired by nature in this way.
+%Relate this back, why does EVCO benefit from biomimicry.
+
+\subsection{EC for Snake}
+building on previous work in this area\cite{snake_paper, snake_blog}.
+
+% general overview of the problems that will be discussed in the next section
+%challenges that might be faced in this task
+%GENERAL TASKS WITH GENETIC PROGRAMMING
+
+%difficulties around the game that might cause issues
+%PROBLEMS WITH THE TASK (SNAKE) in particular
+The game itself features elements of stochasticity. In a given round the snake's food might spawn in a number of random places. This adds an additional level of difficulty to the problem as the fitness of a given algorithm may change on each run. One option to get around this could be to perform the fitness evaluation on multiple plays of the game in order to get a more fair [] of how the algorithm performs overall.
+
+\section{Methods} %[35 marks..!]
+% Quality of the design of the algorithm (e.g. choice of representation, fitness
+% assessment, other details) to produce a snake AI. Give full details of the algorithm
+% choices. Your should provide details and good rationale for your choices.
+
+\subsection{Representation}
+% Discussion of Genotype vs Phenotype mapping, or if traits are 1:1
+\subsubsection{Available Options}
+%LECTURE: 'Representation of the problem (encoding) can help to better understand the landscape of the problem.'
+%Representation can significantly affect the size of the search space and thus the time needed to search it
+%Compresses the model and thus it requires less storage space, this is good because..?
+
+%Thoughts- obviously don't want to loose too much detail by having a representation that is TOO abstract -this will lead to bad solutions
+
+Representation options:
+Genetic Algorithms
+Evolutionary Programming
+Evolutionary Strategy
+
+Genetic Programming <----- ???
+Typing? Strong/Weak?
+
+Grammatical Evolution? Is this explicitly supported in DEAP?
+%DEAP is a requirement, so if this is not support, this is a valid reason to reject it.. however it can be mentioned in further work below!
+DEAP's transparency allows virtually any algorithm to be implemented but it's easier to use the built in structures.
+
+%Does the number of functions (primitives) affect the Algorithm's performance?
+
+
+\subsubsection{Choice and Justification}
+
+\subsubsection{Physical Environments}
+%Textbook: An important category of GP applications arises in contexts where executing a given expression changes the environment.
+% ... THIS IS THE CASE IN SNAKE? See textbook Chap 6.10
+
+Which additional sensing functions (if any) have been implemented? Additional functions may help the snake to find a better solution, however we need to be careful of overparameterising the problem. This is a common trade-off in many forms of machine learning?
+
+\subsubsection{Initialisation Procedure}
+%Full/Grow/Ramped Half and Half?
+
+\subsection{Population and Evaluation}
+\subsubsection{General Discussion}
+%Population Size? A trade off-
+%too big.. problems?
+%too small.. problems?
+
+%fixed size or not? <--- probably, but WHY?!
+%easier to encode in an array? <- not if size of individuals might grow?
+
+\subsubsection{Parent Selection}
+%How do we pick which individuals continue?
+
+%Multiple objectives?
+%keep snake alive
+%get more food!
+
+\subsubsection{Maintaining Diversity}
+
+Within evolutionary computation, the simulations individuals correspond to.. %a section of the search space that is showing promising results
+A diverse population is, by definition, exploring more of the search space than one that is not. %CONSIDER PHRASING
+
+% Don't want to get stuck in a local optimum
+% Why is this a problem?
+Textbook: 'Premature convergence is the well-known effect of losing population diversity too quickly and getting trapped in a local optimum.'
+
+Diversity is difficult to quantity in an objective manner and, as such, no single measure for it exists\cite{}.
+Textbook:
+some options are: no. phenotypes/genotypes, no. different fitness values
+
+% Losing good individuals? Hall of Fame/Elitism
+%Does this have a positive/negative effect
+In biological evolution, old generations die to free up resources for newer generations.
+Disregarding solutions due to age ... %good or bad? diversity, other measures?
+
+Parent Selection can be random, so (if this is the case) good solutions may well die out.
+
+
+\subsubsection{Bloat}
+Bloat, the increase of a program size without significant increase in fitness, is a difficult problem to overcome. Bloat is linked (but different) to overfitting, a common problem in many forms of machine learning\cite{overfitting_bloat}.
+
+% How we work to prevent this,
+Several recent papers discuss this issue and propose methods for tackling it\cite{parsimony_pressure, multi_objective_bloat}.
+The two main solutions to bloat are parsimony pressure and double tournaments.
+
+% Talk about how this is similar to general case overfitting in other machine learning problems
+% Parsimony Pressure vs. Double Tournament
+\cite{multi_objective_bloat}
+
+It has been shown that the order of a double tournament has no significant bearing on the end result. [cite, practical?]
+
+% Ongoing work into this may be interesting to talk about!
+
+\subsection{Variation Operators}
+\subsubsection{Mutation}
+%KEY- without it genes would ONLY be shuffled around..
+%too much mutation will create madness- our population will not be stable andgood genes will not be around for long!
+
+%mutation can create biases (particularly with real valued mutation) how do we prevent this?
+
+\subsubsection{Recombination}
+%Crossover- 
+%IF GA, is this fixed point crossover??
+
+%multipoint crossover, uniform crossover, no crossover?
+
+
+\subsubsection{Termination Condition}
+
+
+\section{Results} %Results.. [35 marks]
+% Use your evolutionary algorithm to find as good a solution as possible. Evaluate your
+% snake(s) and your algorithm and use appropriate statistical methods in your reporting.
+
+%randomness can cause odd results! we need to run multiple times, 30 replicates should be enough to get a broad idea of the evolutionary trends
+%large numbers of runs can produce results that are significant but not important
+
+%In order to evaluate we need to compare it with a control
+%designing controls can be difficult, they may be subject to: placebo effect & observer effect
+
+% USE A NULL HYPOTHESIS!!
+%Non-parametric tests DO NOT require a distribution to be normal and should be the default choice, rank sum test??
+
+\subsubsection{Calibration}
+% Describe how appropriate values for crossover and mutation were chosen to evolve the best agents,
+
+\section{Conclusion} %[10 marks]
+% Well written and clear
+\subsection{Main Findings}
+% Summarizes findings well and highlights key points
+% Connects well with the literature and provides relevant references
+% Demonstrates critical ability
+% Provides good suggestions for future work
+
+\subsection{Further Work}
+%Grammatical Evolution, if possible in another tool
+%Is there any way we could use co-evolutionary algorithms to evolve the snake further?
+	%Have another snake that will race for the food so it has to get there quicker?
+
+\raggedright
+\bibliography{Report}{}
+\bibliographystyle{ieeetran}
+\newpage
+\section{Appendix}
+ 
+\end{document}
