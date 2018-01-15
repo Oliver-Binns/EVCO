@@ -26,7 +26,7 @@
 % Submit Code, 5 marks
 % Must be a 'good final solution' and run on a test set
 
-\section{Abstract} %Unmarked
+%\section{Abstract} %Unmarked - is it necessary?
 
 
 % 15 marks
@@ -41,23 +41,32 @@
 
 \subsection{Background}
 Biomimicry, the imitation of nature for solving human problems has produced many examples of world class design. 
-Some great examples of Biomimicry are Velcro(R), self-cleaning paints and Shinkansen high-speed trains\cite{biomimicry}. In particular these examples imitate the form of nature's physical systems. Since the term biomimicry was first coined in 1997, this design philosophy has started to inspire new developments in various subjects such as the circular economy in product design[CITE] as well as several pieces of ongoing work in Computer Science such as self-driving cars[CITE].
+Some great examples of Biomimicry are Velcro(R), self-cleaning paints and Shinkansen high-speed trains\cite{biomimicry}. In particular these examples imitate the form of nature's physical systems. Since the term biomimicry was first coined in 1997, this design philosophy has started to inspire new developments in various subjects such as the circular economy in product design[CITE] as well as several pieces of ongoing work in Computer Science such as swarm robotics[CITE].
+\\\\
 %TALK ABOUT THE BENEFITS OF BIOMIMICRY
 Life has been around on earth for 3.8 billion years, this is a lot of R\&D time to produce useful solutions which can be related to many of the current problems in various fields[CITE, VOX video].
-
+\\\\
 Clearly Evolutionary Computation is an optimisation process inspired by nature in this way.
 %Relate this back, why does EVCO benefit from biomimicry.
 
+%Excerpt from Biomimicry: This "hill climbing" in a landscape of possibilities towards an optimal design is what engineers do, but computers can generate random ideas much faster than most engineers. And computers, not yet able to feel embarassment or peer pressure, are not afraid to try off-the-wall ideas. Ideas are just ideas; the more the merrier. page 209
+
+\subsection{DEAP}
+\textbf{D}istributed \textbf{E}volutionary \textbf{A}lgorithms in \textbf{P}ython (DEAP) is an open source framework for Python\cite{deap}. This framework aims to be 
+
 \subsection{EC for Snake}
-building on previous work in this area\cite{snake_paper, snake_blog}.
-
-% general overview of the problems that will be discussed in the next section
-%challenges that might be faced in this task
-%GENERAL TASKS WITH GENETIC PROGRAMMING
-
+The task given is to create an evolutionary algorithm in Python using the DEAP frameowrk in order to play the classic video game, Snake. This is not a new task and has been the subject of previous work including an ...\cite{snake_blog} and more recently a ...\cite{snake_paper}. Despite this there is still room for further work, due to ongoing research into evolutionary computing and significant challenges because of the nature of the game.
+\\\\
+There are a variety of available instances of Snake with an array of different rules. In this case, there is a square game board of 14x14 cells as shown in Figure. \ref{fig:game_board}. The snake will continously move forwards in the direction it is facing, which can be changed by the user at any time. The aim is to collect food that appears in a random cell on the board when the previous one is eaten. Each time the snake eats a piece of food, it grows and takes up an extra cell. Once the snake fills every cell it can no longer grow. Hence, the highest possible score (185) is equal to the number of cells (196) less the initial length of the snake (11).
+\\\\
 %difficulties around the game that might cause issues
 %PROBLEMS WITH THE TASK (SNAKE) in particular
-The game itself features elements of stochasticity. In a given round the snake's food might spawn in a number of random places. This adds an additional level of difficulty to the problem as the fitness of a given algorithm may change on each run. One option to get around this could be to perform the fitness evaluation on multiple plays of the game in order to get a more fair [] of how the algorithm performs overall.
+Implementing this task will involve facing all of the usual challenges in evolutionary computation such as maintaining diversity and reducing bloat. Snake also brings along new challenges. The random placement of the food on the board adds an element of stochasticity to the solution meaning algorithm will perform differently across multiple runs and care will need to be taken to ensure that it works in the general case. The solution will also need to balance the need for the snake to avoid crashing into walls or itself while still picking up the food before time runs out. Optimising both of these objectives at the same time might be difficult.
+
+%general overview of the problems that will be discussed in the next section
+%challenges that might be faced in this task
+%GENERAL TASKS WITH GENETIC PROGRAMMING
+Starter sensing functions are given that tell the snake if there is a wall, 
 
 \section{Methods} %[35 marks..!]
 % Quality of the design of the algorithm (e.g. choice of representation, fitness
@@ -66,22 +75,31 @@ The game itself features elements of stochasticity. In a given round the snake's
 
 \subsection{Representation}
 % Discussion of Genotype vs Phenotype mapping, or if traits are 1:1
+
+
 \subsubsection{Available Options}
 %LECTURE: 'Representation of the problem (encoding) can help to better understand the landscape of the problem.'
 %Representation can significantly affect the size of the search space and thus the time needed to search it
 %Compresses the model and thus it requires less storage space, this is good because..?
+The representation of the problem can significantly affect the algorithm's performance. 
 
-%Thoughts- obviously don't want to loose too much detail by having a representation that is TOO abstract -this will lead to bad solutions
+%Thoughts- obviously don't want to loose too much detail by having a representation that is TOO abstract -this will lead to bad solutions- CITATION NEEDED
 
-Representation options:
-Genetic Algorithms
-Evolutionary Programming
-Evolutionary Strategy
+\myparagraph{Genetic Algorithms (GA)}
+Genetic Algorithms are perhaps the most commonly used form of evolutionary algorithm. The term genetic algorithms
 
-Genetic Programming <----- ???
-Typing? Strong/Weak?
+\myparagraph{Evolutionary Programming (EP)}
 
-Grammatical Evolution? Is this explicitly supported in DEAP?
+\myparagraph{Evolutionary Strategy (ES)}
+
+\myparagraph{Genetic Programming (GP)}
+The aim of genetic programming is to evolve programs that can be used to solve a problem. Clearly this is immediately more relevant for our snake implementation, the aim would be to create a program that can be run to determine our next move given the current state. GP uses a tree representation for programs, where the internal nodes are functions and the leaf nodes of the tree are constants and variables.
+
+\myparagraph{Neuroevolution}
+Neuroevolution is a ... %hybrid between evolutionary computing and neural networks.
+Unfortunately as the brief requires that the DEAP Python library is used, neuroevolution is not an available option as DEAP does not support it.
+
+Grammatical Evolution? Is this explicitly supported in DEAP?\cite{deap}
 %DEAP is a requirement, so if this is not support, this is a valid reason to reject it.. however it can be mentioned in further work below!
 DEAP's transparency allows virtually any algorithm to be implemented but it's easier to use the built in structures.
 
@@ -89,74 +107,85 @@ DEAP's transparency allows virtually any algorithm to be implemented but it's ea
 
 
 \subsubsection{Choice and Justification}
+Genetic Programming will be used as it most closely fits out aims. The sensing functions can be used for the 
+
+Typing? Strong/Weak?
+
 
 \subsubsection{Physical Environments}
 %Textbook: An important category of GP applications arises in contexts where executing a given expression changes the environment.
 % ... THIS IS THE CASE IN SNAKE? See textbook Chap 6.10
 
-Which additional sensing functions (if any) have been implemented? Additional functions may help the snake to find a better solution, however we need to be careful of overparameterising the problem. This is a common trade-off in many forms of machine learning?
+%Which additional sensing functions (if any) have been implemented?
+Additional functions may help the snake to find a better solution, however we need to be careful of overparameterising the problem.
+This is a common trade-off in many forms of machine learning?
 
 \subsubsection{Initialisation Procedure}
 %Full/Grow/Ramped Half and Half?
 
 \subsection{Population and Evaluation}
 \subsubsection{General Discussion}
+%Multiple objectives?
+%keep snake alive
+%get more food!
+Implementing a good fitness evaluation function is essential to evolving a solution to this problem. Without this, there will be no way to assess individuals in order to determine which will survive and reproduce. While there are two major objectives at play in the game, avoiding crashing the snake and getting to the food before the timer hits zero, these can be represented by the final size of the snake when the game ends. As such, we can simply consider this a single-objective problem where the objective is produce the maximum length of snake before either the snake crashes or the timer hits zero. This significantly simplifies the problem with minimal impact. The game itself does feature elements of stochasticity. In a given round the snake's food might spawn in a number of random places. This adds an additional level of difficulty to the problem as the fitness of a given algorithm will likely change between runs.
+%One option to get around this could be to perform the fitness evaluation on multiple plays of the game in order to get a more fair assessment of how the algorithm performs overall.
+%Is this solved by sequential iterations?
+
 %Population Size? A trade off-
 %too big.. problems?
+
 %too small.. problems?
 
-%fixed size or not? <--- probably, but WHY?!
+%fixed size or not? <--- probably, but WHY?! "In almost all EA applications the population size is constant and does not change during the evolutionary search." - Textbook WHY WHY WHY WHY?!?!?!! - citation needed
 %easier to encode in an array? <- not if size of individuals might grow?
 
 \subsubsection{Parent Selection}
 %How do we pick which individuals continue?
+Selecting which individuals should have influence over the next generation is one of the most important factors for success in Evolutionary Computing. If only the best individuals are selected then diversity will be lost, the algorithm will get stuck in a local minima and be unable to find a good general solution. This is known as premature convergence. If too many of the less-promising solutions are selected then the algorithm may be unstable meaning good solutions will take too long to find and may be lost quickly. Striking a good balance between a diverse population and a stable algorithm is necessary for success in this task.
 
-%Multiple objectives?
-%keep snake alive
-%get more food!
+%Roulette Wheel vs Tournament
 
 \subsubsection{Maintaining Diversity}
-
-Within evolutionary computation, the simulations individuals correspond to.. %a section of the search space that is showing promising results
-A diverse population is, by definition, exploring more of the search space than one that is not. %CONSIDER PHRASING
+Within this evolutionary computation task, each individual of the population corresponds to a point in the search space of all possible programs. %a section of the search space that is showing promising results
+Diversity corresponds to having these points reasonably spread out throughout this space. A diverse population is, by definition, exploring more of this search space than one that is not. %CONSIDER PHRASING
+%Can this be related back to k-nearest vs least-squares? Other machine learning problems
 
 % Don't want to get stuck in a local optimum
 % Why is this a problem?
 Textbook: 'Premature convergence is the well-known effect of losing population diversity too quickly and getting trapped in a local optimum.'
 
-Diversity is difficult to quantity in an objective manner and, as such, no single measure for it exists\cite{}.
-Textbook:
-some options are: no. phenotypes/genotypes, no. different fitness values
+Diversity is difficult to quantity in an objective manner and, as such, no single measure for it exists. A range of different measures including the number of different fitness values, number of different phenotypes/genotypes or entropy may be used\cite{textbook}.
 
 % Losing good individuals? Hall of Fame/Elitism
+Elitism is used to ensure that the best solution isn't randomly removed from the population. If no better solution is ever found, this solution will want to be present in the final population once evolution is complete.
+
 %Does this have a positive/negative effect
 In biological evolution, old generations die to free up resources for newer generations.
 Disregarding solutions due to age ... %good or bad? diversity, other measures?
 
 Parent Selection can be random, so (if this is the case) good solutions may well die out.
 
-
 \subsubsection{Bloat}
-Bloat, the increase of a program size without significant increase in fitness, is a difficult problem to overcome. Bloat is linked (but different) to overfitting, a common problem in many forms of machine learning\cite{overfitting_bloat}.
-
+Bloat, the increase of the size of a genetic program without significant increase in fitness, is a difficult problem to overcome. Bloat is linked to, but different from, overfitting, a common problem in many forms of machine learning\cite{overfitting_bloat}. Controlling bloat while maximising fitness turns the evolution into a multi-objective optimisation problem. The two most commonly used solutions to bloat are parsimony pressure and double tournaments. Parsimony pressure subtracts a value based on the size of the program tree from the individual's fitness, this value does not necessarily need to be linear. %CONSIDER phrasing here
+Double tournaments use a secondary 
+It has been shown that the order of a double tournament has no significant bearing on the end result. [cite, practical?]
 % How we work to prevent this,
-Several recent papers discuss this issue and propose methods for tackling it\cite{parsimony_pressure, multi_objective_bloat}.
-The two main solutions to bloat are parsimony pressure and double tournaments.
+%Several recent papers discuss this issue and propose methods for tackling it\cite{parsimony_pressure, multi_objective_bloat}.
+
 
 % Talk about how this is similar to general case overfitting in other machine learning problems
 % Parsimony Pressure vs. Double Tournament
 \cite{multi_objective_bloat}
 
-It has been shown that the order of a double tournament has no significant bearing on the end result. [cite, practical?]
-
 % Ongoing work into this may be interesting to talk about!
 
 \subsection{Variation Operators}
 \subsubsection{Mutation}
-%KEY- without it genes would ONLY be shuffled around..
-%too much mutation will create madness- our population will not be stable andgood genes will not be around for long!
-
-%mutation can create biases (particularly with real valued mutation) how do we prevent this?
+Mutation is the operator that adds the novel, 'off-the-wall' ideas into the population. Without it, genes would only be shuffled around.. %why is this bad..
+A trade-off is required here, too much mutation will result in a highly unstable algorithm. Far too much mutation would %move this to calibration section perhaps?
+Care needs to be taken when implementing mutation so as not to create biases. This is particularly the case with real-valued mutation.. %which is not being used in this project?
+%How to prevent biases?
 
 \subsubsection{Recombination}
 %Crossover- 
@@ -166,7 +195,8 @@ It has been shown that the order of a double tournament has no significant beari
 
 
 \subsubsection{Termination Condition}
-
+%Certain number of generations? - consistent across runs
+%Certain fitness level? - guarantees a good solution
 
 \section{Results} %Results.. [35 marks]
 % Use your evolutionary algorithm to find as good a solution as possible. Evaluate your
@@ -181,7 +211,11 @@ It has been shown that the order of a double tournament has no significant beari
 % USE A NULL HYPOTHESIS!!
 %Non-parametric tests DO NOT require a distribution to be normal and should be the default choice, rank sum test??
 
-\subsubsection{Calibration}
+%SEE Discovering Statistics using R
+
+%COMPARE to Blog and Paper?
+
+\subsection{Calibration}
 % Describe how appropriate values for crossover and mutation were chosen to evolve the best agents,
 
 \section{Conclusion} %[10 marks]
@@ -192,15 +226,38 @@ It has been shown that the order of a double tournament has no significant beari
 % Demonstrates critical ability
 % Provides good suggestions for future work
 
-\subsection{Further Work}
-%Grammatical Evolution, if possible in another tool
-%Is there any way we could use co-evolutionary algorithms to evolve the snake further?
-	%Have another snake that will race for the food so it has to get there quicker?
 
+%Has deap proved a good tool for this task?
+%pros/cons?
+
+\subsection{Further Work}
+%Grammatical Evolution/Neuroevolution, if possible in another tool
+%Is there any way we could use co-evolutionary algorithms to evolve the snake further?
+	%Have another snake that will race for the food so it has to get there quicker? - other variants of snake
+
+\newpage
 \raggedright
 \bibliography{Report}{}
 \bibliographystyle{ieeetran}
+
 \newpage
 \section{Appendix}
+
+\begin{figure}[h]
+\centering
+\begin{subfigure}{0.4\textwidth}
+\centering
+\includegraphics[width=0.5\textwidth]{game_board_1}
+\label{fig:game_board_1}
+\end{subfigure}%
+\begin{subfigure}{0.4\textwidth}
+\centering
+\includegraphics[width=0.5\textwidth]{game_board_2}
+\label{fig:game_board_2}
+\end{subfigure}
+
+\caption{The 14x14 Game Board}
+\label{fig:game_board}
+\end{figure}
  
 \end{document}

@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.17 (TeX Live 2016) (preloaded format=pdflatex 2017.2.1)  10 JAN 2018 22:14
+This is pdfTeX, Version 3.14159265-2.6-1.40.17 (TeX Live 2016) (preloaded format=pdflatex 2017.2.1)  13 JAN 2018 02:27
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -241,7 +241,12 @@ LaTeX Font Info:    External font `cmex10' loaded for size
 (Font)              <8> on input line 22.
 LaTeX Font Info:    External font `cmex10' loaded for size
 (Font)              <6> on input line 22.
-(./Report.toc)
+(./Report.toc
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <7> on input line 2.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <5> on input line 2.
+)
 \tf@toc=\write3
 \openout3 = `Report.toc'.
 
@@ -249,63 +254,79 @@ LaTeX Font Info:    External font `cmex10' loaded for size
 
 {/Users/Oliver/Library/texlive/2016basic/texmf-var/fonts/map/pdftex/updmap/pdft
 ex.map}]
+Underfull \hbox (badness 10000) in paragraph at lines 43--51
 
-LaTeX Warning: Citation `biomimicry' on page 1 undefined on input line 44.
-
-
-LaTeX Warning: Citation `snake_paper' on page 1 undefined on input line 52.
+ []
 
 
-LaTeX Warning: Citation `snake_blog' on page 1 undefined on input line 52.
+Underfull \hbox (badness 10000) in paragraph at lines 43--51
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 58--65
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 58--65
+
+ []
 
 [1]
+Underfull \hbox (badness 10000) in paragraph at lines 87--88
 
-LaTeX Warning: Citation `overfitting_bloat' on page 2 undefined on input line 1
-40.
-
-
-LaTeX Warning: Citation `parsimony_pressure' on page 2 undefined on input line 
-143.
+ []
 
 
-LaTeX Warning: Citation `multi_objective_bloat' on page 2 undefined on input li
-ne 143.
+Underfull \hbox (badness 10000) in paragraph at lines 89--90
+
+ []
 
 
-LaTeX Warning: Citation `multi_objective_bloat' on page 2 undefined on input li
-ne 148.
+Underfull \hbox (badness 10000) in paragraph at lines 91--92
 
-(./Report.bbl [2]
-Missing character: There is no â in font cmr10!
-Missing character: There is no € in font cmr10!
-Missing character: There is no “ in font cmr10!
- [3]) [4] [5] (./Report.aux)
-
-LaTeX Warning: There were undefined references.
+ []
 
 
-LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
+Underfull \hbox (badness 10000) in paragraph at lines 93--94
 
- ) 
+ []
+
+[2] [3] [4] (./Report.bbl) [5]
+<game_board_1.png, id=27, 107.40125pt x 243.91125pt>
+File: game_board_1.png Graphic file (type png)
+ <use game_board_1.png>
+Package pdftex.def Info: game_board_1.png used on input line 246.
+(pdftex.def)             Requested size: 86.72267pt x 196.95293pt.
+
+<game_board_2.png, id=28, 107.40125pt x 243.91125pt>
+File: game_board_2.png Graphic file (type png)
+ <use game_board_2.png>
+Package pdftex.def Info: game_board_2.png used on input line 251.
+(pdftex.def)             Requested size: 86.72267pt x 196.95293pt.
+
+[6 <./game_board_1.png> <./game_board_2.png>] (./Report.aux) ) 
 Here is how much of TeX's memory you used:
- 3665 strings out of 494447
- 55764 string characters out of 6166767
- 125650 words of memory out of 5000000
- 6975 multiletter control sequences out of 15000+600000
+ 3679 strings out of 494447
+ 56042 string characters out of 6166767
+ 125785 words of memory out of 5000000
+ 6986 multiletter control sequences out of 15000+600000
  8241 words of font info for 29 fonts, out of 8000000 for 9000
  319 hyphenation exceptions out of 8191
- 42i,6n,40p,504b,251s stack positions out of 5000i,500n,10000p,200000b,80000s
-</usr/local/texlive/2016basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx1
-0.pfb></usr/local/texlive/2016basic/texmf-dist/fonts/type1/public/amsfonts/cm/c
-mbx12.pfb></usr/local/texlive/2016basic/texmf-dist/fonts/type1/public/amsfonts/
-cm/cmr10.pfb></usr/local/texlive/2016basic/texmf-dist/fonts/type1/public/amsfon
-ts/cm/cmr12.pfb></usr/local/texlive/2016basic/texmf-dist/fonts/type1/public/ams
-fonts/cm/cmr17.pfb></usr/local/texlive/2016basic/texmf-dist/fonts/type1/public/
-amsfonts/cm/cmti10.pfb>
-Output written on Report.pdf (6 pages, 104164 bytes).
+ 42i,8n,40p,938b,380s stack positions out of 5000i,500n,10000p,200000b,80000s
+</usr/local/texli
+ve/2016basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb></usr/local/t
+exlive/2016basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/loc
+al/texlive/2016basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/
+local/texlive/2016basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></u
+sr/local/texlive/2016basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb>
+</usr/local/texlive/2016basic/texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.
+pfb>
+Output written on Report.pdf (7 pages, 136822 bytes).
 PDF statistics:
- 47 PDF objects out of 1000 (max. 8388607)
- 32 compressed objects within 1 object stream
+ 54 PDF objects out of 1000 (max. 8388607)
+ 36 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
- 1 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 11 words of extra memory for PDF output out of 10000 (max. 10000000)
 

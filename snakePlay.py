@@ -42,24 +42,24 @@ def playGame():
 		win.border(0)
 
 		prevKey = key                                                  # Previous key pressed
-	 	event = win.getch()
-	 	key = key if event == -1 else event 
+		event = win.getch()
+		key = key if event == -1 else event
 
 		if key not in [KEY_LEFT, KEY_RIGHT, KEY_UP, KEY_DOWN, 27]:     # If an invalid key is pressed
 			key = prevKey
 
-	    # Calculates the new coordinates of the head of the snake. NOTE: len(snake) increases
+		# Calculates the new coordinates of the head of the snake. NOTE: len(snake) increases
 	    # This is taken care of later at [1] (where we pop the tail)
 		snake.insert(0, [snake[0][0] + (key == KEY_DOWN and 1) + (key == KEY_UP and -1), snake[0][1] + (key == KEY_LEFT and -1) + (key == KEY_RIGHT and 1)])
 
-	    # Game over if the snake goes through a wall
+		# Game over if the snake goes through a wall
 		if snake[0][0] == 0 or snake[0][0] == (YSIZE-1) or snake[0][1] == 0 or snake[0][1] == (XSIZE-1): break
 
 		ahead = [ snake[0][0] + (key == KEY_DOWN and 1) + (key == KEY_UP and -1), snake[0][1] + (key == KEY_LEFT and -1) + (key == KEY_RIGHT and 1)] 
 		if ahead in snake:
 			A = "YES"
 
-	    # Game over if the snake runs over itself
+		# Game over if the snake runs over itself
 		if snake[0] in snake[1:]: break
 	    
 		if snake[0] in food:                                            # When snake eats the food
@@ -72,10 +72,10 @@ def playGame():
 		win.addch(snake[0][0], snake[0][1], '#')
 
 	curses.endwin()
-	print A
+	print(A)
 	print("\nFinal score - " + str(score))
-	print
-	print wasAhead
+	print()
+	print(wasAhead)
 
 playGame()
 
