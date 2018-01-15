@@ -4,6 +4,7 @@ import itertools
 import numpy
 import operator
 import random
+import time
 
 from deap import algorithms
 from deap import base
@@ -11,6 +12,13 @@ from deap import creator
 from deap import gp
 from deap import tools
 from functools import partial
+
+EVAL_RUNS = 10
+POP_SIZE = 200
+TOTAL_GENS = 700
+MUT_PB = 0.2
+CRX_PB = 0.5
+
 
 S_RIGHT, S_LEFT, S_UP, S_DOWN = 0,1,2,3
 XSIZE,YSIZE = 14,14
@@ -127,7 +135,7 @@ snake = SnakePlayer()
 # it displays the game graphically and thus runs slower
 # This function is designed for you to be able to view and assess
 # your strategies, rather than use during the course of evolution
-def displayStrategyRun():
+def displayStrategyRun(individual):
 	global snake
 	global pset
 
@@ -151,7 +159,7 @@ def displayStrategyRun():
 	timer = 0
 	collided = False
 	while not collided and not timer == ((2*XSIZE) * YSIZE):
-
+                time.sleep(0.3)
 		# Set up the display
 		win.border(0)
 		win.addstr(0, 2, 'Score : ' + str(snake.score) + ' ')
@@ -177,9 +185,9 @@ def displayStrategyRun():
 		hitBounds = (timer == ((2*XSIZE) * YSIZE))
 
 	curses.endwin()
-
-	print(collided)
-	print(hitBounds)
+        print("Score:", snake.score)
+	print("Collided: ", collided)
+	print("Hit Bounds:", hitBounds)
 	raw_input("Press to continue...")
 
 	return snake.score,
@@ -252,9 +260,10 @@ toolbox.register("compile", gp.compile, pset=pset)
 def eval(code):
 	tree = gp.compile(code, pset)
 	total = 0
-	for i in range(10):
+
+	for i in range(EVAL_RUNS):
 		total += runGame(tree)[0]
-	return total / 10,
+	return total / EVAL_RUNS,
 
 
 toolbox.register("evaluate", eval)
@@ -279,30 +288,37 @@ def main():
 	## THIS IS WHERE YOUR CORE EVOLUTIONARY ALGORITHM WILL GO #
 	random.seed(318)
 
-	pop = toolbox.population(n=2000)
+	pop = toolbox.population(n=POP_SIZE)
 	hof = tools.HallOfFame(1)
 
 	stats_fit = tools.Statistics(lambda ind: ind.fitness.values)
 	stats_size = tools.Statistics(len)
 	mstats = tools.MultiStatistics(fitness=stats_fit, size=stats_size)
-	mstats.register("avg", numpy.mean)
-	mstats.register("std", numpy.std)
+	mstats.register("avg", lambda val: round(numpy.mean(val), 2))
+	mstats.register("std", lambda val: round(numpy.std(val), 2))
 	mstats.register("min", numpy.min)
 	mstats.register("max", numpy.max)
 
 	pop, log = algorithms.eaSimple(
 		pop,
 		toolbox,
-		0.5,  # CHANCE OF CROSSOVER
-		0.1,  # CHANCE OF MUTATION
-		700,  # NO Generations
+		CRX_PB,  # CHANCE OF CROSSOVER
+		MUT_PB,  # CHANCE OF MUTATION
+		TOTAL_GENS,  # NO Generations
 		halloffame=hof,
 		verbose=True,
 		stats=mstats
 	)
 
-
+        
 	# Total score as..
 	# Attempt parsimony length prevention first
+	best = tools.selBest(pop, 1)
+	for ind in best:
+                displayStrategyRun(ind)
+
+        worst = tools.selWorst(pop, 1)
+	for ind in worst:
+                displayStrategyRun(ind)
 
 main()
