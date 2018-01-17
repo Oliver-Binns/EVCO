@@ -7,7 +7,7 @@
  
 \usepackage{xcolor}
 \newcommand{\highlight}[1]{\colorbox{yellow!50}{$\displaystyle#1$}}
-
+\hyphenpenalty=700
 
 \title{Evolutionary Computation}
 \author{Y1481702}
@@ -40,15 +40,14 @@
 
 
 \subsection{Background}
-Biomimicry, the imitation of nature for solving human problems has produced many examples of world class design. 
-Some great examples of Biomimicry are Velcro(R), self-cleaning paints and Shinkansen high-speed trains\cite{biomimicry}. In particular these examples imitate the form of nature's physical systems. Since the term biomimicry was first coined in 1997, this design philosophy has started to inspire new developments in various subjects such as the circular economy in product design[CITE] as well as several pieces of ongoing work in Computer Science such as swarm robotics[CITE].
+Biomimicry, the imitation of nature for solving human problems has produced many examples of world class design such as Velcro(R), self-cleaning paints and Shinkansen high-speed trains\cite{biomimicry}.  Since the term biomimicry was first coined in 1997, this design philosophy has started to inspire many new developments. As well as the aforementioned mimics of physical systems in nature, natural processes have also been imitated, such as in the circular economy in product design and swarm robotics in computer science.
 \\\\
 %TALK ABOUT THE BENEFITS OF BIOMIMICRY
-Life has been around on earth for 3.8 billion years, this is a lot of R\&D time to produce useful solutions which can be related to many of the current problems in various fields[CITE, VOX video].
-\\\\
-Clearly Evolutionary Computation is an optimisation process inspired by nature in this way.
 %Relate this back, why does EVCO benefit from biomimicry.
+Evolutionary Computation (EC) is a machine learning technique which is directly inspired by biological evolution. This is clearly another example of an imitation of nature's processes. 
+Life has been around on earth for over 3.5 billion years, this is a lot of research \& development time to produce useful solutions which can be related to many of the current problems in a wide range of fields. Through evolution, nature has already produced solutions to many of the hardest machine learning problems of today.
 
+Machine learning usually focuses on optimisation of a particular goal...? link this into the following-->
 %Excerpt from Biomimicry: This "hill climbing" in a landscape of possibilities towards an optimal design is what engineers do, but computers can generate random ideas much faster than most engineers. And computers, not yet able to feel embarassment or peer pressure, are not afraid to try off-the-wall ideas. Ideas are just ideas; the more the merrier. page 209
 
 \subsection{DEAP}
@@ -112,19 +111,26 @@ Genetic Programming will be used as it most closely fits the aims set out in the
 Typing? Strong/Weak?
 
 \subsubsection{Physical Environments}
+%MOVE THIS SECTION TO EVALUATION? ---------->>>
 %Textbook: An important category of GP applications arises in contexts where executing a given expression changes the environment.
 % ... THIS IS THE CASE IN SNAKE? See textbook Chap 6.10
+This application of GP fits into a specific category involving a physical enviroment, which in this case is simulated. The added difficulty comes from the fact that the execution of any terminal element may change the environment. Once this change has been made, the subsequent execution may produce a different effect in the environment. %relate this to snake:
 
+In this kind of application the internal EA mechanics remains the same, but fitness evalutation can be significantly more computationally expensive.\cite[p. 110]{textbook}
+% <--------
+
+%rename section "Function Set", add "Terminal Set section"
 %Which additional sensing functions (if any) have been implemented?
 Additional functions may help the snake to find a better solution, however we need to be careful of overparameterising the problem.
 This is a common trade-off in many forms of machine learning?
+%see function set experiment conducted in paper! - take results from this?
 
 \subsubsection{Initialisation Procedure}
 %Full/Grow/Ramped Half and Half?
 
 \subsection{Population}
 \subsubsection{Size}
-In almost all EA applications the population size is constant\cite[pp.20]{textbook}
+In almost all EA applications the population size is constant\cite[p. 20]{textbook}
 The size of the population can also affect the algorithm's performance. If the population size is too small it may not be exploring enough of the search space to contain any good solutions. It will then require a large amount of mutation to find any good solutions creating a very unstable solution. If the population size is too large it will take a lot of time to evaluate and select potential parents.
 %Population Size? A trade off-
 %too big.. problems?
@@ -134,7 +140,7 @@ The size of the population can also affect the algorithm's performance. If the p
 %fixed size or not? <--- probably, but WHY?! "In almost all EA applications the population size is constant and does not change during the evolutionary search." - Textbook WHY WHY WHY WHY?!?!?!! - citation needed
 %easier to encode in an array? <- not if size of individuals might grow?
 
-\subsection{Diversity}
+\subsubsection{Diversity}
 Within this evolutionary computation task, each individual of the population corresponds to a point in the search space of all possible programs. %a section of the search space that is showing promising results
 Diversity corresponds to having these points reasonably spread out throughout this space. A diverse population is, by definition, exploring more of this search space than one that is not. %CONSIDER PHRASING
 %Can this be related back to k-nearest vs least-squares? Other machine learning problems
@@ -170,10 +176,13 @@ Parent Selection can be random, so (if this is the case) good solutions may well
 Diversity is difficult to quantity in an objective manner and, as such, no single measure for it exists. A range of different measures including the number of different fitness values, number of different phenotypes/genotypes or entropy may be used\cite{textbook}.
 
 \myparagraph{Roulette Wheel}
-
+%description
+%Pros, cons
 
 \myparagraph{Tournament}
 \label{tournament}
+%description
+%pros, cons
 
 
 \subsubsection{Bloat}% How we work to prevent this,
@@ -194,7 +203,8 @@ It has been shown that the order of a double tournament has no significant beari
 
 \subsection{Variation Operators}
 \subsubsection{Mutation}
-Mutation is the operator that adds the novel, 'off-the-wall' ideas into the population. Without it, genes would only be shuffled around.. %why is this bad..
+Mutation is the operator which incorporates new ideas into the population. Without it, genes would only be shuffled around and no new solutions could be found. %why is this bad..
+%relate this to the search space..?
 A trade-off is required here, too much mutation will result in a highly unstable algorithm. Far too much mutation would %move this to calibration section perhaps?
 Care needs to be taken when implementing mutation so as not to create biases. This is particularly the case with real-valued mutation.. %which is not being used in this project?
 %How to prevent biases?
