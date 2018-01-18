@@ -5,7 +5,11 @@ import itertools
 import numpy
 import operator
 import random
-import time
+#import time
+from timeit import default_timer as timer
+import pickle
+
+import matplotlib.pyplot as plt
 
 from deap import algorithms
 from deap import base
@@ -14,12 +18,11 @@ from deap import gp
 from deap import tools
 from functools import partial
 
-EVAL_RUNS = 4
+EVAL_RUNS = 1
 POP_SIZE = 10000
 TOTAL_GENS = 500
 MUT_PB = 0
 CRX_PB = 0.8
-
 
 S_RIGHT, S_LEFT, S_UP, S_DOWN = 0,1,2,3
 XSIZE,YSIZE = 14,14
@@ -424,9 +427,9 @@ def eval(individual):
 
 toolbox.register("evaluate", eval)
 
-#toolbox.register("select", tools.selTournament, tournsize=3)
-toolbox.register("select", tools.selDoubleTournament,
-	fitness_size=3, parsimony_size=1.2, fitness_first=False)
+toolbox.register("select", tools.selTournament, tournsize=3)
+#toolbox.register("select", tools.selDoubleTournament,
+#	fitness_size=3, parsimony_size=1.2, fitness_first=False)
 toolbox.register("mate", gp.cxOnePointLeafBiased, termpb=0.1)
 toolbox.register("expr_mut", gp.genFull, min_=0, max_=2)
 toolbox.register("mutate", gp.mutUniform, expr=toolbox.expr_mut, pset=pset)
@@ -437,41 +440,81 @@ for type in ["mate", "mutate"]:
 		gp.staticLimit(key=operator.attrgetter("height"), max_value=17)
 	)
 
+time_log = open("Statistics/Baseline/Timing.txt", "w")
+
 def main():
+	global time_log
 	global snake
 	global pset
 
 	## THIS IS WHERE YOUR CORE EVOLUTIONARY ALGORITHM WILL GO #
 	#random.seed(318)
+	mean_fit = []
+	max_fit = []
 
-	pop = toolbox.population(n=POP_SIZE)
-	hof = tools.HallOfFame(1)
+	for i in range(30):
+		time_log.write("Run " + str(i) + "\n")
+		start = timer()
+		time_log.write("Start: " + str(start) + "\n")
 
-	stats_fit = tools.Statistics(lambda ind: ind.fitness.values)
-	stats_size = tools.Statistics(len)
-	mstats = tools.MultiStatistics(fitness=stats_fit, size=stats_size)
-	mstats.register("avg", lambda val: round(numpy.mean(val), 2))
-	mstats.register("std", lambda val: round(numpy.std(val), 2))
-	mstats.register("min", numpy.min)
-	mstats.register("max", numpy.max)
+		pop = toolbox.population(n=POP_SIZE)
+		hof = tools.HallOfFame(1)
 
-	pop, log = algorithms.eaSimple(
-		pop,
-		toolbox,
-		CRX_PB,  # CHANCE OF CROSSOVER
-		MUT_PB,  # CHANCE OF MUTATION
-		TOTAL_GENS,  # NO Generations
-		halloffame=hof,
-		verbose=True,
-		stats=mstats
-	)
+		stats_fit = tools.Statistics(lambda ind: ind.fitness.values)
+		stats_size = tools.Statistics(len)
+		mstats = tools.MultiStatistics(fitness=stats_fit, size=stats_size)
+		mstats.register("avg", lambda val: round(numpy.mean(val), 2))
+		mstats.register("std", lambda val: round(numpy.std(val), 2))
+		mstats.register("min", numpy.min)
+		mstats.register("max", numpy.max)
 
-	# Total score as..
-	# Attempt parsimony length prevention first
-	best = tools.selBest(pop, 1)
-	for ind in best:
-		for i in range(50):
-			#displayStrategyRun(ind)
-			print(runGame(ind))
+		pop, log = algorithms.eaSimple(
+			pop,
+			toolbox,
+			CRX_PB,  # CHANCE OF CROSSOVER
+			MUT_PB,  # CHANCE OF MUTATION
+			TOTAL_GENS,  # NO Generations
+			halloffame=hof,
+			verbose=True,
+			stats=mstats
+		)
+
+		end = timer()
+		time_log.write("End: " + str(end) + "\n")
+		time_log.write("Elapsed: " +  str(end - start) + "\n")
+
+		lb_file = open("Statistics/Baseline/Run "+str(i)+".txt", "wb")
+		pickle.dump(log, lb_file)
+		lb_file.close()
+
+		y1, y2 = log.chapters["fitness"].select("avg", "min")
+		mean_fit.append(y1)
+		max_fit.append(y2)
+
+		# Total score as..
+		# Attempt parsimony length prevention first
+		best = tools.selBest(pop, 1)
+		for ind in best:
+			scores = []
+			for i in range(50):
+				scores.append(runGame(ind)[0])
+			print
+			print(scores)
+			time_log.write("Scores: " + str(scores) + "\n\n")
+
+	x = range(TOTAL_GENS + 1)
+	y1np = numpy.array(mean_fit)
+	y1 = y1np.mean(axis=0)
+	y2 = max(max_fit)
+	
+	plt.plot(x, y1, label="Mean Fitness")
+	plt.plot(x, y2, label="Most Fit")
+	plt.title("Fitness Progress through Generations")
+	plt.xlabel("Generation")
+	plt.ylabel("Fitness")
+	plt.legend(loc='lower left')
+	plt.savefig("fitness_benchmark.png")
+	#plt.show()
 
 main()
+time_log.close()
