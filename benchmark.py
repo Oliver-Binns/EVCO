@@ -14,11 +14,11 @@ from deap import gp
 from deap import tools
 from functools import partial
 
-EVAL_RUNS = 20
-POP_SIZE = 100
+EVAL_RUNS = 4
+POP_SIZE = 10000
 TOTAL_GENS = 500
-MUT_PB = 0.2
-CRX_PB = 0.5
+MUT_PB = 0
+CRX_PB = 0.8
 
 
 S_RIGHT, S_LEFT, S_UP, S_DOWN = 0,1,2,3
@@ -427,7 +427,7 @@ toolbox.register("evaluate", eval)
 #toolbox.register("select", tools.selTournament, tournsize=3)
 toolbox.register("select", tools.selDoubleTournament,
 	fitness_size=3, parsimony_size=1.2, fitness_first=False)
-toolbox.register("mate", gp.cxOnePoint)
+toolbox.register("mate", gp.cxOnePointLeafBiased, termpb=0.1)
 toolbox.register("expr_mut", gp.genFull, min_=0, max_=2)
 toolbox.register("mutate", gp.mutUniform, expr=toolbox.expr_mut, pset=pset)
 

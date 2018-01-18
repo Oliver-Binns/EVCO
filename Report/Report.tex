@@ -96,7 +96,6 @@ GP has previously been explored by Ehlis\cite{snake_blog} and produced some prom
 \myparagraph{Neuroevolution}
 Neuroevolution is a hybrid technique between evolutionary computing and artificial neural networks (ANN).
 Unfortunately as the brief requires that the DEAP Python library is used, neuroevolution is not an available option as DEAP does not support it.
-
 Grammatical Evolution? Is this explicitly supported in DEAP?\cite{deap}
 %DEAP is a requirement, so if this is not support, this is a valid reason to reject it.. however it can be mentioned in further work below!
 DEAP's transparency allows virtually any algorithm to be implemented but it's easier to use the built in structures.
@@ -109,16 +108,16 @@ DEAP's transparency allows virtually any algorithm to be implemented but it's ea
 Genetic Programming will be used as it most closely fits the aims set out in the introduction above. The sensing functions can be used for the 
 
 Typing? Strong/Weak?
+\\\\
+A previous implementation of GP for snake has been implemented and is available online\cite{snake_blog}, this has been re-written in DEAP and slightly adapted to allow it to work with the available controls (up, down, left, right). This new implementation will be used as a baseline for further improvement. Any changes proposed in this report will be compared against this baseline in order to produce meaningful results.
 
 \subsubsection{Physical Environments}
 %MOVE THIS SECTION TO EVALUATION? ---------->>>
 %Textbook: An important category of GP applications arises in contexts where executing a given expression changes the environment.
 % ... THIS IS THE CASE IN SNAKE? See textbook Chap 6.10
-This application of GP fits into a specific category involving a physical enviroment, which in this case is simulated. The added difficulty comes from the fact that the execution of any terminal element may change the environment. Once this change has been made, the subsequent execution may produce a different effect in the environment. %relate this to snake:
+This application of GP fits into a specific category involving a physical enviroment, which in this case is simulated. The added difficulty comes from the fact that the execution of any terminal element may change the environment. Once this change has been made, the subsequent execution may produce a different effect in the environment. In this kind of application the internal EA mechanics remains the same, but fitness evalutation can be significantly more computationally expensive\cite[p. 110]{textbook} in order to get a fair representation. In this example, as with the baseline example, the fitness of a particular program will need to be determined over a full game, instead of a single turn.
 
-In this kind of application the internal EA mechanics remains the same, but fitness evalutation can be significantly more computationally expensive.\cite[p. 110]{textbook}
 % <--------
-
 %rename section "Function Set", add "Terminal Set section"
 %Which additional sensing functions (if any) have been implemented?
 Additional functions may help the snake to find a better solution, however we need to be careful of overparameterising the problem.
@@ -132,6 +131,7 @@ This is a common trade-off in many forms of machine learning?
 \subsubsection{Size}
 In almost all EA applications the population size is constant\cite[p. 20]{textbook}
 The size of the population can also affect the algorithm's performance. If the population size is too small it may not be exploring enough of the search space to contain any good solutions. It will then require a large amount of mutation to find any good solutions creating a very unstable solution. If the population size is too large it will take a lot of time to evaluate and select potential parents.
+
 %Population Size? A trade off-
 %too big.. problems?
 
@@ -214,7 +214,7 @@ Care needs to be taken when implementing mutation so as not to create biases. Th
 %IF GA, is this fixed point crossover??
 
 %multipoint crossover, uniform crossover, no crossover?
-
+%cxOnePoint, cxTwoPoint, cxUniform, cxPartiallyMatched
 
 \subsubsection{Termination Condition}
 %Certain number of generations? - consistent across runs
@@ -230,7 +230,7 @@ Care needs to be taken when implementing mutation so as not to create biases. Th
 %In order to evaluate we need to compare it with a control
 %designing controls can be difficult, they may be subject to: placebo effect & observer effect
 
-% USE A NULL HYPOTHESIS!!
+%USE A NULL HYPOTHESIS!!
 %Non-parametric tests DO NOT require a distribution to be normal and should be the default choice, rank sum test??
 
 %SEE Discovering Statistics using R
@@ -248,6 +248,7 @@ Care needs to be taken when implementing mutation so as not to create biases. Th
 % Connects well with the literature and provides relevant references
 % Demonstrates critical ability
 % Provides good suggestions for future work
+Significant 
 
 
 %Has DEAP proved a good tool for this task?

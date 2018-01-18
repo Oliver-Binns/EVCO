@@ -1,5 +1,6 @@
 # This code defines the agent (as in the playable version) in a way that can be called and executed from an evolutionary algorithm. The code is partial and will not execute. You need to add to the code to create an evolutionary algorithm that evolves and executes a snake agent.
-#import curses
+import curses
+#import console
 import itertools
 import numpy
 import operator
@@ -13,9 +14,9 @@ from deap import gp
 from deap import tools
 from functools import partial
 
-EVAL_RUNS = 10
-POP_SIZE = 200
-TOTAL_GENS = 700
+EVAL_RUNS = 20
+POP_SIZE = 1000
+TOTAL_GENS = 100
 MUT_PB = 0.2
 CRX_PB = 0.5
 
@@ -51,11 +52,17 @@ class SnakePlayer(list):
 		self.food = []
 
 	def getAheadLocation(self):
-		self.ahead = [ self.body[0][0] + (self.direction == S_DOWN and 1) + (self.direction == S_UP and -1), self.body[0][1] + (self.direction == S_LEFT and -1) + (self.direction == S_RIGHT and 1)] 
+		self.ahead = self.getAheadOf(self.body[0])
+
+	def getAheadOf(self, cell):
+		return [
+			cell[0] + (self.direction == S_DOWN and 1) + (self.direction == S_UP and -1),
+			cell[1] + (self.direction == S_LEFT and -1) + (self.direction == S_RIGHT and 1)
+		]
 
 	def updatePosition(self):
 		self.getAheadLocation()
-		self.body.insert(0, self.ahead )
+		self.body.insert(0, self.ahead)
 
 	## You are free to define more sensing options to the snake
 	def changeDirectionUp(self):
@@ -71,40 +78,123 @@ class SnakePlayer(list):
 		self.direction = S_LEFT
 
 	def snakeHasCollided(self):
-		self.hit = False
-		if self.body[0][0] == 0 or self.body[0][0] == (YSIZE-1) or self.body[0][1] == 0 or self.body[0][1] == (XSIZE-1):
-			self.hit = True
-		if self.body[0] in self.body[1:]:
-			self.hit = True
-		return self.hit
+		if self.body[0][0] == 0 or self.body[0][0] == (YSIZE-1) or self.body[0][1] == 0 or self.body[0][1] == (XSIZE-1): return True
+		if self.body[0] in self.body[1:]: return True
+		return False
 
-	def sense_wall_ahead(self):
-		self.getAheadLocation()
+	def is_wall(self, cell):
 		return (
-			self.ahead[0] == 0 or self.ahead[0] == (YSIZE-1) or self.ahead[1] == 0 
-			or self.ahead[1] == (XSIZE-1)
+			cell[0] == 0 or cell[0] == (YSIZE-1) or
+			cell[1] == 0 or cell[1] == (XSIZE-1)
 		)
 
-	def sense_food_ahead(self):
-		self.getAheadLocation()
-		return self.ahead in self.food
+	#if this cell is part of the snake excluding IT'S HEAD
+	def is_tail(self, cell):
+		return cell in self.body[1:]
 
+	#wall must be IMMEDIATELY ahead to return true
+	def sense_wall_ahead(self):
+		self.getAheadLocation()
+		return self.is_wall(self.ahead)
+
+	#tail must be IMMEDIATELY ahead to return true!
 	def sense_tail_ahead(self):
 		self.getAheadLocation()
-		return self.ahead in self.body
-		
-	def form(self, method, out1, out2):
-		return partial(if_then_else, method, out1, out2)
-	
-	def if_wall_ahead(self, out1, out2):
-		return partial(if_then_else, self.sense_wall_ahead, out1, out2)
+		return is_tail(self.ahead)
+
+	def sense_danger_left(self):
+		self.getAheadLocation()
+		left = list(self.body[0])
+		if self.direction == S_UP:
+			left[0] -= 1
+		elif self.direction == S_DOWN:
+			left[0] += 1
+		elif self.direction == S_RIGHT:
+			left[1] += 1
+		elif self.direction == S_LEFT:
+			left[1] -= 1
+		return self.is_tail(left) or self.is_wall(left)
+
+	def sense_danger_right(self):
+		self.getAheadLocation()
+		right = list(self.body[0])
+
+		if self.direction == S_UP:
+			right[0] += 1
+		elif self.direction == S_DOWN:
+			right[0] -= 1
+		elif self.direction == S_RIGHT:
+			right[1] -= 1
+		elif self.direction == S_LEFT:
+			right[1] += 1
 			
+		return self.is_tail(right) or self.is_wall(right)
+
+	#food can be ahead in any cell along this row!
+	def sense_food_ahead(self):
+		self.getAheadLocation()
+
+		#up/down is FIRST coordinate
+		#origin (0, 0) is top/left
+		if self.direction == S_UP:
+			for item in self.food:
+				if (item[0] <= self.ahead[0] and
+				   item[1] == self.ahead[1]):
+					return True
+		elif self.direction == S_DOWN:
+			for item in self.food:
+				if (item[0] >= self.ahead[0] and
+					item[1] == self.ahead[1]):
+					return True
+
+		elif self.direction == S_RIGHT:
+			for item in self.food:
+				if (item[0] == self.ahead[0] and
+					item[1] >= self.ahead[1]):
+					return True
+		elif self.direction == S_LEFT:
+			for item in self.food:
+				if (item[0] == self.ahead[0] and
+					item[1] <= self.ahead[1]):
+					return True
+		return False
+
+	def sense_danger_two_ahead(self):
+		self.getAheadLocation()
+		two_ahead = self.getAheadOf(self.ahead)
+
+		return self.is_tail(two_ahead) or self.is_wall(two_ahead)
+
+	#proximity sensing
+	def if_danger_ahead(self, out1, out2):
+		return partial(if_then_else, lambda: self.sense_wall_ahead or sense_tail_ahead, out1, out2)
+
+	def if_danger_left(self, out1, out2):
+		return partial(if_then_else, self.sense_danger_left, out1, out2)
+
+	def if_danger_right(self, out1, out2):
+		return partial(if_then_else, self.sense_danger_right, out1, out2)
+
 	def if_food_ahead(self, out1, out2):
 		return partial(if_then_else, self.sense_food_ahead, out1, out2)
-		
-	def if_tail_ahead(self, out1, out2):
-		return partial(if_then_else, self.sense_tail_ahead, out1, out2)
-		
+
+	def if_danger_two_ahead(self, out1, out2):
+		return partial(if_then_else, lambda: self.sense_danger_two_ahead, out1, out2)
+
+	#food directionality check
+	def if_food_up(self, out1, out2):
+		return partial(if_then_else, lambda: self.body[0][0] > self.food[0][0], out1, out2)
+
+	def if_food_down(self, out1, out2):
+		return partial(if_then_else, lambda: self.body[0][0] < self.food[0][0], out1, out2)
+
+	def if_food_left(self, out1, out2):
+		return partial(if_then_else, lambda: self.body[0][1] > self.food[0][1], out1, out2)
+
+	def if_food_right(self, out1, out2):
+		return partial(if_then_else, lambda: self.body[0][1] < self.food[0][1], out1, out2)
+
+	#movement checks- to compensate for different terminal functionality in this variant	
 	def if_moving_right(self, out1, out2):
 		return partial(if_then_else, lambda: self.direction == S_RIGHT, out1, out2)
 		
@@ -159,14 +249,14 @@ def displayStrategyRun(individual):
 	timer = 0
 	collided = False
 	while not collided and not timer == ((2*XSIZE) * YSIZE):
-                time.sleep(0.3)
+		time.sleep(0.3)
 		# Set up the display
 		win.border(0)
 		win.addstr(0, 2, 'Score : ' + str(snake.score) + ' ')
  		win.getch()
 
 		## EXECUTE THE SNAKE'S BEHAVIOUR HERE ##
-
+		routine()
 		snake.updatePosition()
 
 		if snake.body[0] in food:
@@ -185,31 +275,85 @@ def displayStrategyRun(individual):
 		hitBounds = (timer == ((2*XSIZE) * YSIZE))
 
 	curses.endwin()
-        print("Score:", snake.score)
+	print("Score:", snake.score)
 	print("Collided: ", collided)
 	print("Hit Bounds:", hitBounds)
 	raw_input("Press to continue...")
 
 	return snake.score,
 
+def displayRunPythonista(individual):
+	global snake
+	global pset
+
+	routine = gp.compile(individual, pset)
+
+	snake._reset()
+	food = placeFood(snake)
+
+	timer = 0
+	collided = False
+	
+	endline = "-" * (XSIZE + 2)
+	
+	while not collided and not timer == ((2*XSIZE) * YSIZE):
+		time.sleep(0.3)
+		# Set up the display
+		console.clear()
+		print(0, 2, 'Score : ' + str(snake.score) + ' ')
+		print endline
+		for x in range(XSIZE):
+			line = "|"
+			for y in range(YSIZE):
+				if [x, y] in snake.body:
+					line += "X"
+				elif [x, y] in food:
+					line += "@"
+				else:
+					line += " "
+			print line + "|"
+		print endline
+
+		## EXECUTE THE SNAKE'S BEHAVIOUR HERE ##
+		routine()
+		snake.updatePosition()
+
+		if snake.body[0] in food:
+			snake.score += 1
+			food = placeFood(snake)
+			timer = 0
+		else:    
+			last = snake.body.pop()
+			timer += 1 # timesteps since last eaten
+
+		collided = snake.snakeHasCollided()
+		hitBounds = (timer == ((2*XSIZE) * YSIZE))
+
+	print("Score:", snake.score)
+	print("Collided: ", collided)
+	print("Hit Bounds:", hitBounds)
+	raw_input("Press to continue...")
+
+	return snake.score,
 
 # This outline function provides partial code for running the game with an evolved agent
 # There is no graphical output, and it runs rapidly, making it ideal for
 # you need to modify it for running your agents through the game for evaluation
 # which will depend on what type of EA you have used, etc.
 # Feel free to make any necessary modifications to this section.
-def runGame(instructions):
+def runGame(individual):
 	global snake
+	global pset
 
-	totalScore = 0
+	routine = gp.compile(individual, pset)
 
 	snake._reset()
 	food = placeFood(snake)
 	timer = 0
-	while not snake.snakeHasCollided() and not timer == XSIZE * YSIZE:
 
+	while not snake.snakeHasCollided() and not timer == XSIZE * YSIZE:
 		## EXECUTE THE SNAKE'S BEHAVIOUR HERE ##
-		instructions()
+		routine()
 		snake.updatePosition()
 
 		if snake.body[0] in food:
@@ -220,9 +364,7 @@ def runGame(instructions):
 			snake.body.pop()
 			timer += 1 # timesteps since last eaten
 
-		totalScore += snake.score
-
-	return totalScore,
+	return snake.score,
 
 #BASIC EA SET UP
 creator.create("Fitness", base.Fitness, weights=(1.0,))
@@ -238,9 +380,22 @@ def prog2(out1, out2):
 	return partial(progn, out1, out2)
 
 # CURRENTLY WORKS ON boolean, can we use int values to improve this??
-pset.addPrimitive(snake.if_tail_ahead, 2)
-pset.addPrimitive(snake.if_wall_ahead, 2)
+
+#allows multiple elements to be computed after each other..
+pset.addPrimitive(prog2, 2)
+
+pset.addPrimitive(snake.if_danger_ahead, 2)
+pset.addPrimitive(snake.if_danger_left, 2)
+pset.addPrimitive(snake.if_danger_right, 2)
 pset.addPrimitive(snake.if_food_ahead, 2)
+pset.addPrimitive(snake.if_danger_two_ahead, 2)
+
+
+pset.addPrimitive(snake.if_food_up, 2)
+pset.addPrimitive(snake.if_food_down, 2)
+pset.addPrimitive(snake.if_food_left, 2)
+pset.addPrimitive(snake.if_food_right, 2)
+
 pset.addPrimitive(snake.if_moving_up, 2)
 pset.addPrimitive(snake.if_moving_down, 2)
 pset.addPrimitive(snake.if_moving_right, 2)
@@ -257,13 +412,13 @@ toolbox.register("individual", tools.initIterate, creator.Individual, toolbox.ex
 toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 toolbox.register("compile", gp.compile, pset=pset)
 
-def eval(code):
-	tree = gp.compile(code, pset)
+BOARD_SIZE = XSIZE * YSIZE
+MAX_FITNESS = BOARD_SIZE - len(snake.body)
+def eval(individual):
 	total = 0
-
 	for i in range(EVAL_RUNS):
-		total += runGame(tree)[0]
-	return total / EVAL_RUNS,
+		total += runGame(individual)[0] * total if total > 0 else 1
+	return (total / EVAL_RUNS),
 
 
 toolbox.register("evaluate", eval)
@@ -286,7 +441,7 @@ def main():
 	global pset
 
 	## THIS IS WHERE YOUR CORE EVOLUTIONARY ALGORITHM WILL GO #
-	random.seed(318)
+	#random.seed(318)
 
 	pop = toolbox.population(n=POP_SIZE)
 	hof = tools.HallOfFame(1)
@@ -310,15 +465,13 @@ def main():
 		stats=mstats
 	)
 
-        
 	# Total score as..
 	# Attempt parsimony length prevention first
 	best = tools.selBest(pop, 1)
 	for ind in best:
-                displayStrategyRun(ind)
-
-        worst = tools.selWorst(pop, 1)
-	for ind in worst:
-                displayStrategyRun(ind)
+		#for i in range(50):
+		while True:
+			displayStrategyRun(ind)
+		#print(runGame(ind))
 
 main()
