@@ -434,13 +434,16 @@ toolbox.register("mate", gp.cxOnePointLeafBiased, termpb=0.1)
 toolbox.register("expr_mut", gp.genFull, min_=0, max_=2)
 toolbox.register("mutate", gp.mutUniform, expr=toolbox.expr_mut, pset=pset)
 
+pool = multiprocessing.Pool()
+toolbox.register("map", pool.map)
+
 for type in ["mate", "mutate"]:
 	toolbox.decorate(
 		type,
 		gp.staticLimit(key=operator.attrgetter("height"), max_value=17)
 	)
 
-time_log = open("Statistics/Baseline/Timing.txt", "w")
+time_log = open("Statistics/Baseline/Timing.txt", "a")
 
 def main():
 	global time_log
@@ -468,16 +471,21 @@ def main():
 		mstats.register("min", numpy.min)
 		mstats.register("max", numpy.max)
 
-		pop, log = algorithms.eaSimple(
-			pop,
-			toolbox,
-			CRX_PB,  # CHANCE OF CROSSOVER
-			MUT_PB,  # CHANCE OF MUTATION
-			TOTAL_GENS,  # NO Generations
-			halloffame=hof,
-			verbose=True,
-			stats=mstats
-		)
+		try:
+			pop, log = algorithms.eaSimple(
+				pop,
+				toolbox,
+				CRX_PB,  # CHANCE OF CROSSOVER
+				MUT_PB,  # CHANCE OF MUTATION
+				TOTAL_GENS,  # NO Generations
+				halloffame=hof,
+				verbose=True,
+				stats=mstats
+			)
+		except KeyboardInterrupt:
+			pool.terminate()
+			pool.join()
+			raise KeyboardInterrupt
 
 		end = timer()
 		time_log.write("End: " + str(end) + "\n")
@@ -496,7 +504,7 @@ def main():
 		best = tools.selBest(pop, 1)
 		for ind in best:
 			scores = []
-			for i in range(50):
+			for i in range(500):
 				scores.append(runGame(ind)[0])
 			print
 			print(scores)
