@@ -2,6 +2,7 @@
 \usepackage{graphicx}
 \usepackage[nottoc,numbib]{tocbibind}
 \usepackage[a4paper, total={6in, 8in}]{geometry}
+\usepackage{multirow}
 \usepackage{subcaption}
 \newcommand{\myparagraph}[1]{\paragraph{#1}\mbox{}\\}
  
@@ -38,7 +39,6 @@
 % Makes the problem and challenges clear
 % Highlights the approach that will be used and justifies it
 
-
 \subsection{Background}
 Biomimicry, the imitation of nature for solving human problems has produced many examples of world class design such as Velcro(R), self-cleaning paints and Shinkansen high-speed trains\cite{biomimicry}.  Since the term biomimicry was first coined in 1997, this design philosophy has started to inspire many new developments. As well as the aforementioned mimics of physical systems in nature, natural processes have also been imitated, such as in the circular economy in product design and swarm robotics in computer science.
 \\\\
@@ -51,10 +51,10 @@ Machine learning usually focuses on optimisation of a particular goal...? link t
 %Excerpt from Biomimicry: This "hill climbing" in a landscape of possibilities towards an optimal design is what engineers do, but computers can generate random ideas much faster than most engineers. And computers, not yet able to feel embarassment or peer pressure, are not afraid to try off-the-wall ideas. Ideas are just ideas; the more the merrier. page 209
 
 \subsection{DEAP}
-\textbf{D}istributed \textbf{E}volutionary \textbf{A}lgorithms in \textbf{P}ython (DEAP) is an open source framework for Python\cite{deap}. The framework aims to provide tools for quickly producing custom evolutionary algorithms. It provides a large amount of in-built functionality for implementing commonly used evolutionary algorithms and allows for parts of these to be mixed and matched as well as intermixed with custom sections.
+\textbf{D}istributed \textbf{E}volutionary \textbf{A}lgorithms in \textbf{P}ython (DEAP) is an open source framework for Python\cite{deap}. The framework aims to provide tools for quickly producing custom evolutionary algorithms. It provides a large amount of in-built functionality for implementing commonly used evolutionary algorithms and allows for parts of these to be mixed and matched as well as intermixed with custom sections. %WHICH VERSION OF DEAP WAS USED?
 
 \subsection{EC for Snake}
-The task given is to create an evolutionary algorithm in Python using the DEAP frameowrk in order to play the classic video game, Snake. This is not a new task and has been the subject of previous work including an ...\cite{snake_blog} and more recently a ...\cite{snake_paper}. Despite this there is still room for further work, due to ongoing research into evolutionary computing and significant challenges because of the nature of the game.
+The task given is to create an evolutionary algorithm in Python using the DEAP framework in order to play the classic video game, Snake. This is not a new task and has been the subject of previous work including an ...\cite{snake_blog} and more recently a ...\cite{snake_paper}. Despite this there is still room for further work, due to ongoing research into evolutionary computing and significant challenges because of the nature of the game.
 \\\\
 There are a variety of available instances of Snake with an array of different rules. In this case, there is a square game board of 14x14 cells as shown in Figure. \ref{fig:game_board}. The snake will continously move forwards in the direction it is facing, which can be changed by the user at any time. The aim is to collect food that appears in a random cell on the board when the previous one is eaten. Each time the snake eats a piece of food, it grows and takes up an extra cell. Once the snake fills every cell it can no longer grow. Hence, the highest possible score (185) is equal to the number of cells (196) less the initial length of the snake (11).
 \\\\
@@ -71,6 +71,8 @@ Starter sensing functions are given that tell the snake if there is a wall, itse
 % Quality of the design of the algorithm (e.g. choice of representation, fitness
 % assessment, other details) to produce a snake AI. Give full details of the algorithm
 % choices. Your should provide details and good rationale for your choices.
+\subsection{Technology}
+%INSERT LAB PC SPECS HERE
 
 \subsection{Representation}
 % Discussion of Genotype vs Phenotype mapping, or if traits are 1:1
@@ -109,36 +111,36 @@ Genetic Programming will be used as it most closely fits the aims set out in the
 
 Typing? Strong/Weak?
 \\\\
-A previous implementation of GP for snake has been implemented and is available online\cite{snake_blog}, this has been re-written in DEAP and slightly adapted to allow it to work with the available controls (up, down, left, right). While the highly successful results from this original experiment could not be full reproduced, this new implementation gives a good baseline for judging further improvements. Any changes proposed in this report will be compared against this baseline in order to produce meaningful results. In order to avoid anomalous results caused by randomness, all results given are the mean result over 30 code runs.
+A previous implementation of GP for snake is available online\cite{snake_blog}, this has been re-written in DEAP and slightly adapted to allow it to work with the available controls (up, down, left, right). Originally, this code was run with a population of 10,000 across 500 generations. Due to time constraints, this amount of computing was not feasible and needed to be considerably cut down. The final results have been generated using a population of X across Y generations. While the highly successful results from this original experiment could not be full reproduced, this new implementation gives a good baseline for judging further improvements. Any changes proposed in this report will be compared against this baseline in order to produce meaningful results. In order to avoid anomalous results caused by randomness, all results given are the mean result over 30 code runs.%TODO determine reasonable tolerance for generations AND population
 
 \subsubsection{Physical Environments}
 %MOVE THIS SECTION TO EVALUATION? ---------->>>
 %Textbook: An important category of GP applications arises in contexts where executing a given expression changes the environment.
 % ... THIS IS THE CASE IN SNAKE? See textbook Chap 6.10
-This application of GP fits into a specific category involving a physical enviroment, which in this case is simulated. The added difficulty comes from the fact that the execution of any terminal element may change the environment. Once this change has been made, the subsequent execution may produce a different effect in the environment. In this kind of application the internal EA mechanics remains the same, but fitness evalutation can be significantly more computationally expensive\cite[p. 110]{textbook} in order to get a fair representation. In this example, as with the baseline example, the fitness of a particular program will need to be determined over a full game, instead of a single turn.
+This application of GP fits into a specific category involving a physical enviroment, which in this case is simulated. The added difficulty comes from the fact that the execution of any terminal element may change the environment. Once this change has been made, the subsequent execution may produce a different effect in the environment. In this kind of application the internal EA mechanics remains the same, but fitness evalutation can be significantly more computationally expensive\cite[p. 110]{textbook} in order to get a fair representation. In this example, as with the control, the fitness of a particular program will need to be determined over a full game, instead of a single turn. This will be discussed further in Section \ref{fitness_evaluation}.
 
 % <--------
 %rename section "Function Set", add "Terminal Set section"
 %Which additional sensing functions (if any) have been implemented?
-Additional functions may help the snake to find a better solution, however we need to be careful of overparameterising the problem.
+Previous work has shown that the function set can help to find a better solution, however we need to be careful of overparameterising the problem.%cite for this
 This is a common trade-off in many forms of machine learning?
 %see function set experiment conducted in paper! - take results from this?
+The control code has an expanded function set from the original brief\ref{table:function_set}.
 
 \subsubsection{Initialisation Procedure}
 %Full/Grow/Ramped Half and Half?
 
 \subsection{Population}
 \subsubsection{Size}
-In almost all EA applications the population size is constant\cite[p. 20]{textbook}
-The size of the population can also affect the algorithm's performance. If the population size is too small it may not be exploring enough of the search space to contain any good solutions. It will then require a large amount of mutation to find any good solutions creating a very unstable solution. If the population size is too large it will take a lot of time to evaluate and select potential parents.
-
-%Population Size? A trade off-
-%too big.. problems?
-
-%too small.. problems?
-
 %fixed size or not? <--- probably, but WHY?! "In almost all EA applications the population size is constant and does not change during the evolutionary search." - Textbook WHY WHY WHY WHY?!?!?!! - citation needed
 %easier to encode in an array? <- not if size of individuals might grow?
+In almost all EA applications the population size is constant\cite[p. 20]{textbook}
+\\\\
+The size of the population needs to be large enough to explore a significant amount of the search space by containing a number of promising individuals. If this is not the case, a large amount of mutation will be required to find any good solutions creating a very unstable solution. Too large a population will significantly impact the algorithm's performance. As the population size tends towards the size of the search space, the algorithm becomes no better than a brute force solution, running unnecessarily slowly. It has also been mathematically proved that, for certain problems, a larger population is highly likely lead to a sub-optimal solution if the problem has an attraction basin near some local optimum\cite{unhelpful_large_populations}. The algorithm was tested with varying population sizes to show the affect of this on the runtime and the fitness of the final individual produced. The algorithm was run 30 times for each population size, after each run the most fit individual was used to play 500 independent games. These results are shown in Table \ref{table:population_size} and by Figure \ref{}. The runtime values only include the time used for evolution, not for testing the final individual.
+\\\\
+The optimal size for the population is the size where a good solution is often produced but the program is quick to converge.
+\\\\
+An interesting feature in the data is the significant increase in standard deviation as the population size increases. This shows that while larger populations help to produce individuals that perform better overall, this performance is not consistently across multiple games. This issue will be important to address later.
 
 \subsubsection{Diversity}
 Within this evolutionary computation task, each individual of the population corresponds to a point in the search space of all possible programs. %a section of the search space that is showing promising results
@@ -146,15 +148,20 @@ Diversity corresponds to having these points reasonably spread out throughout th
 %Can this be related back to k-nearest vs least-squares? Other machine learning problems
 
 \subsection{Evaluation}
+\label{fitness_evaluation}
 %Multiple objectives?
 %keep snake alive
 %get more food!
 Implementing a good fitness evaluation function is essential to evolving a solution to this problem. Without this, there will be no way to assess individuals in order to determine which will survive and reproduce. While there are two major objectives at play in the game, avoiding crashing the snake and getting to the food before the timer hits zero, these can be represented by the final size of the snake when the game ends. As such, we can simply consider this a single-objective problem where the objective is produce the maximum length of snake before either the snake crashes or the timer hits zero. This significantly simplifies the problem with minimal impact.
 \\\\
-The snake's food spawns randomly around the board. This element of stochasticity makes evaluating the fitness of a particular solution more difficult. The fitness of a given algorithm will likely change between games. In order to ensure a fairer representation of fitness, each solution will need to be evaluated across multiple games.
+The snake's food spawns randomly around the board. This element of stochasticity makes evaluating the fitness of a particular solution more difficult. The fitness of a given algorithm will likely change between games. In order to ensure a fairer representation of fitness, each solution may need to be evaluated across multiple games.
 %DETAIL.. how many games, how can we make this fair?
 %Is each point worth the same?
 	%do we want to incentivise consistently good scores or flukes?
+A number of different fitness functions were tested.
+Each of these have different benefits
+- factorial (single run), increasingly rewards higher scores
+- factorial (multiple runs), heavily rewards individuals which have a consistent high score
 
 \subsection{Parent Selection}
 %How do we pick which individuals continue?
@@ -191,6 +198,8 @@ Bloat, the increase of the size of a genetic program without significant increas
 Controlling bloat while maximising fitness turns the evolution into a multi-objective optimisation problem. The two most commonly used solutions to bloat are parsimony pressure and double tournaments.
 
 Parsimony pressure subtracts a value based on the size of the program tree from the individual's fitness, this value does not necessarily need to be linear. %CONSIDER phrasing here
+%The real aim here is to produce programs with a smaller tree size but similar fitness
+
 \cite{parsimony_pressure}
 
 Double tournaments can be used for parent selection as an extension of regular tournament selection described in Section \ref{tournament}.
@@ -267,7 +276,85 @@ Future work could also explore the adaptability of this program to perform well 
 \newpage
 \section{Appendix}
 
-\begin{figure}[h]
+\begin{table}[h]
+\begin{center}
+\begin{tabular}{|l|l|l|l|r|}
+\hline%Add time taken?
+\textbf{Population Size} & \multicolumn{2}{c|}{\textbf{Run Time}} & \multicolumn{2}{c|}{\textbf{Average Test Run Score}} \\
+\hline
+\multirow{3}{*}{100}
+& Mean & X & Mean & 2.66 \\
+& Max & Y & Max & 11.33 \\
+& St.Dev & Z & St.Dev & 2.12 \\
+\hline
+\multirow{3}{*}{250}
+& Mean & X & Mean & 5.16 \\
+& Max & Y & Max & 19.30 \\
+& St.Dev & Z & St.Dev & 3.38 \\
+\hline
+\multirow{3}{*}{500}
+& Mean & X & Mean & 5.96 \\
+& Max & Y & Max & 21.20 \\
+& St.Dev & Z & St.Dev & 3.96 \\
+\hline
+\multirow{3}{*}{1000}
+& Mean & X & Mean & 7.99 \\
+& Max & Y & Max & 24.80 \\
+& St.Dev & Z & St.Dev & 4.81 \\
+\hline
+\multirow{3}{*}{2500}
+& Mean & X & Mean & Y \\
+& Max & Y & Max & Y \\
+& St.Dev & Z & St.Dev & Z \\
+\hline
+\multirow{3}{*}{5000}
+& Mean & X & Mean & Y \\
+& Max & Y & Max & Y \\
+& St.Dev & Z & St.Dev & Z \\
+\hline
+\multirow{3}{*}{10000}
+& Mean & X & Mean & Y \\
+& Max & Y & Max & Y \\
+& St.Dev & Z & St.Dev & Z \\
+\hline
+\end{tabular}
+\end{center}
+\caption{Population Size Performance}
+\label{table:population_size}
+\end{table}
+
+
+\begin{table}[h]
+\begin{center}
+\begin{tabular}{|l|l|l|r|}
+\hline%Add time taken?
+\textbf{Evaluation} & \textbf{Description} & \multicolumn{2}{c|}{\textbf{Test Runs}} \\
+\hline
+\multirow{4}{*}{Score} & \multirow{4}{*}{description here}
+& Mean & X \\
+&& Max  & Y \\
+&& St.Dev & Z \\
+&& x    & x \\
+\hline
+\multirow{4}{*}{Score Squared} & \multirow{4}{*}{description here}
+& Mean & X \\
+&& Max  & Y \\
+&& St.Dev & Z \\
+&& x    & x \\
+\hline
+\multirow{4}{*}{Score Factorial} & \multirow{4}{*}{description here}
+& Mean & X \\
+&& Max  & Y \\
+&& St.Dev & Z \\
+&& x    & x \\
+\hline
+\end{tabular}
+\end{center}
+\caption{Fitness Evaluation Performance}
+\label{table:function_set}
+\end{table}
+
+\begin{figure}[ht]
 \centering
 \begin{subfigure}{0.4\textwidth}
 \centering
@@ -282,6 +369,25 @@ Future work could also explore the adaptability of this program to perform well 
 
 \caption{The 14x14 Game Board}
 \label{fig:game_board}
+\end{figure}
+
+
+
+\begin{figure}[ht]
+\centering
+\begin{subfigure}{0.5\textwidth}
+\centering
+\includegraphics[width=0.9\textwidth]{Figures/control_fitness}
+\label{fig:control_fitness}
+\end{subfigure}%
+\begin{subfigure}{0.5\textwidth}
+\centering
+\includegraphics[width=0.9\textwidth]{Figures/final_fitness}
+\label{fig:final_fitness}
+\end{subfigure}
+
+\caption{Fitness of final algorithms.}
+\label{fig:fitness_comparison}
 \end{figure}
  
 \end{document}
