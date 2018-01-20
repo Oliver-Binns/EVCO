@@ -16,7 +16,7 @@ from functools import partial
 
 EVAL_RUNS = 20
 POP_SIZE = 1000
-TOTAL_GENS = 100
+TOTAL_GENS = 250
 MUT_PB = 0.2
 CRX_PB = 0.5
 
@@ -27,7 +27,7 @@ NFOOD = 1 # NOTE: YOU MAY NEED TO ADD A CHECK THAT THERE ARE ENOUGH SPACES LEFT 
 
 def if_then_else(condition, out1, out2):
 	out1() if condition() else out2()
-	
+
 # This class can be used to create a basic player object (snake agent)
 class SnakePlayer(list):
 	global S_RIGHT, S_LEFT, S_UP, S_DOWN
@@ -127,7 +127,7 @@ class SnakePlayer(list):
 			right[1] -= 1
 		elif self.direction == S_LEFT:
 			right[1] += 1
-			
+
 		return self.is_tail(right) or self.is_wall(right)
 
 	#food can be ahead in any cell along this row!
@@ -194,16 +194,16 @@ class SnakePlayer(list):
 	def if_food_right(self, out1, out2):
 		return partial(if_then_else, lambda: self.body[0][1] < self.food[0][1], out1, out2)
 
-	#movement checks- to compensate for different terminal functionality in this variant	
+	#movement checks- to compensate for different terminal functionality in this variant
 	def if_moving_right(self, out1, out2):
 		return partial(if_then_else, lambda: self.direction == S_RIGHT, out1, out2)
-		
+
 	def if_moving_left(self, out1, out2):
 		return partial(if_then_else, lambda: self.direction == S_LEFT, out1, out2)
-		
+
 	def if_moving_up(self, out1, out2):
 		return partial(if_then_else, lambda: self.direction == S_UP, out1, out2)
-	
+
 	def if_moving_down(self, out1, out2):
 		return partial(if_then_else, lambda: self.direction == S_DOWN, out1, out2)
 
@@ -265,7 +265,7 @@ def displayStrategyRun(individual):
 			food = placeFood(snake)
 			for f in food: win.addch(f[0], f[1], '@')
 			timer = 0
-		else:    
+		else:
 			last = snake.body.pop()
 			win.addch(last[0], last[1], ' ')
 			timer += 1 # timesteps since last eaten
@@ -293,9 +293,9 @@ def displayRunPythonista(individual):
 
 	timer = 0
 	collided = False
-	
+
 	endline = "-" * (XSIZE + 2)
-	
+
 	while not collided and not timer == ((2*XSIZE) * YSIZE):
 		time.sleep(0.3)
 		# Set up the display
@@ -322,7 +322,7 @@ def displayRunPythonista(individual):
 			snake.score += 1
 			food = placeFood(snake)
 			timer = 0
-		else:    
+		else:
 			last = snake.body.pop()
 			timer += 1 # timesteps since last eaten
 
@@ -360,7 +360,7 @@ def runGame(individual):
 			snake.score += 1
 			food = placeFood(snake)
 			timer = 0
-		else:    
+		else:
 			snake.body.pop()
 			timer += 1 # timesteps since last eaten
 
