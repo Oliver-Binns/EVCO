@@ -73,6 +73,7 @@ Starter sensing functions are given that tell the snake if there is a wall, itse
 % choices. Your should provide details and good rationale for your choices.
 \subsection{Technology}
 %INSERT LAB PC SPECS HERE
+All the described algorithms have been written in Python 2.7.12 and DEAP Version 1.2. They have been run using standard University of York Computer Science lab PCs running Ubuntu 16.04 and containing Quad-Core Intel Core i7-4770 and 16GB of RAM.
 
 \subsection{Representation}
 % Discussion of Genotype vs Phenotype mapping, or if traits are 1:1
@@ -136,9 +137,10 @@ The control code has an expanded function set from the original brief\ref{table:
 %easier to encode in an array? <- not if size of individuals might grow?
 In almost all EA applications the population size is constant\cite[p. 20]{textbook}
 \\\\
-The size of the population needs to be large enough to explore a significant amount of the search space by containing a number of promising individuals. If this is not the case, a large amount of mutation will be required to find any good solutions creating a very unstable solution. Too large a population will significantly impact the algorithm's performance. As the population size tends towards the size of the search space, the algorithm becomes no better than a brute force solution, running unnecessarily slowly. It has also been mathematically proved that, for certain problems, a larger population is highly likely lead to a sub-optimal solution if the problem has an attraction basin near some local optimum\cite{unhelpful_large_populations}. The algorithm was tested with varying population sizes to show the affect of this on the runtime and the fitness of the final individual produced. The algorithm was run 30 times for each population size, after each run the most fit individual was used to play 500 independent games. These results are shown in Table \ref{table:population_size} and by Figure \ref{}. The runtime values only include the time used for evolution, not for testing the final individual.
+The size of the population needs to be large enough to explore a significant amount of the search space by containing a number of promising individuals. If this is not the case, a large amount of mutation will be required to find any good solutions creating a very unstable solution. Too large a population will significantly impact the algorithm's performance. As the population size tends towards the size of the search space, the algorithm becomes no better than a brute force solution, running unnecessarily slowly. It has also been mathematically proved that, for certain problems, a larger population is highly likely lead to a sub-optimal solution if the problem has an attraction basin near some local optimum\cite{unhelpful_large_populations}. The algorithm was tested with varying population sizes to show the affect of this on the runtime and the fitness of the final individual produced. The algorithm was run 30 times for each population size, after each run the most fit individual was used to play 500 independent games. These results are shown in Table \ref{table:population_size} and by Figure \ref{fig:meanscore_v_runtime}. The runtime values only include the time used for evolution, not for testing the final individual.
 \\\\
 The optimal size for the population is the size where a good solution is often produced but the program is quick to converge.
+It is worth noting that the control has a mutation value of 0, so it requires that the initial population contains a reasonable distribution of good individuals. Allowing mutation would allow novel ideas to be introduced later on in the evolution. This will be explored in Section \ref{mutation}.
 \\\\
 An interesting feature in the data is the significant increase in standard deviation as the population size increases. This shows that while larger populations help to produce individuals that perform better overall, this performance is not consistently across multiple games. This issue will be important to address later.
 
@@ -211,6 +213,7 @@ It has been shown that the order of a double tournament has no significant beari
 % Ongoing work into this may be interesting to talk about!
 
 \subsection{Variation Operators}
+% Describe how appropriate values for crossover and mutation were chosen to evolve the best agents,
 \subsubsection{Mutation}
 Mutation is the operator which incorporates new ideas into the population. Without it, genes would only be shuffled around and no new solutions could be found. %why is this bad..
 %relate this to the search space..?
@@ -245,10 +248,7 @@ Care needs to be taken when implementing mutation so as not to create biases. Th
 %SEE Discovering Statistics using R
 %SEE paper: Lecture 4 reading, A Practical Guide for Using Statistical Tests to Assess Randomized Algorithms in Software Testing
 
-%COMPARE to Blog and Paper?
-
-\subsection{Calibration}
-% Describe how appropriate values for crossover and mutation were chosen to evolve the best agents,
+%COMPARE to existing Blog and Paper snake solutions?
 
 \section{Conclusion} %[10 marks]
 % Well written and clear
@@ -280,27 +280,32 @@ Future work could also explore the adaptability of this program to perform well 
 \begin{center}
 \begin{tabular}{|l|l|l|l|r|}
 \hline%Add time taken?
-\textbf{Population Size} & \multicolumn{2}{c|}{\textbf{Run Time}} & \multicolumn{2}{c|}{\textbf{Average Test Run Score}} \\
+\textbf{Population Size} & \multicolumn{2}{c|}{\textbf{Run Time}} & \multicolumn{2}{c|}{\textbf{Mean Test Run Score}} \\
 \hline
 \multirow{3}{*}{100}
-& Mean & X & Mean & 2.66 \\
-& Max & Y & Max & 11.33 \\
-& St.Dev & Z & St.Dev & 2.12 \\
+& Mean & 6.59 & Mean & 2.76 \\
+& Max & 13.5 & Max & 11.60 \\
+& St.Dev & 2.52 & St.Dev & 2.14 \\
 \hline
 \multirow{3}{*}{250}
-& Mean & X & Mean & 5.16 \\
-& Max & Y & Max & 19.30 \\
-& St.Dev & Z & St.Dev & 3.38 \\
+& Mean & 17.7 & Mean & 4.67 \\
+& Max & 28.9 & Max & 18.8 \\
+& St.Dev & 4.22 & St.Dev & 3.48 \\
 \hline
 \multirow{3}{*}{500}
-& Mean & X & Mean & 5.96 \\
-& Max & Y & Max & 21.20 \\
-& St.Dev & Z & St.Dev & 3.96 \\
+& Mean & 43.39 & Mean & 5.81 \\
+& Max & 121.75 & Max & 21.97 \\
+& St.Dev & 18.55 & St.Dev & 3.99 \\
+\hline
+\multirow{3}{*}{750}
+& Mean & 43.39 & Mean & 5.81 \\
+& Max & 121.75 & Max & 21.97 \\
+& St.Dev & 18.55 & St.Dev & 3.99 \\
 \hline
 \multirow{3}{*}{1000}
-& Mean & X & Mean & 7.99 \\
-& Max & Y & Max & 24.80 \\
-& St.Dev & Z & St.Dev & 4.81 \\
+& Mean & 78.59 & Mean & 6.97 \\
+& Max & 133.16 & Max & 24.20 \\
+& St.Dev & 21.63 & St.Dev & 4.61 \\
 \hline
 \multirow{3}{*}{2500}
 & Mean & X & Mean & Y \\
@@ -313,9 +318,9 @@ Future work could also explore the adaptability of this program to perform well 
 & St.Dev & Z & St.Dev & Z \\
 \hline
 \multirow{3}{*}{10000}
-& Mean & X & Mean & Y \\
-& Max & Y & Max & Y \\
-& St.Dev & Z & St.Dev & Z \\
+& Mean & 1437.17 & Mean & 18.0 \\
+& Max & 39.27 & Max & 39.3 \\
+& St.Dev & 7.59 & St.Dev & 7.59 \\
 \hline
 \end{tabular}
 \end{center}
@@ -371,18 +376,25 @@ Future work could also explore the adaptability of this program to perform well 
 \label{fig:game_board}
 \end{figure}
 
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.8\textwidth]{Figures/meanscore_v_runtime}
+\caption{Mean Score against Run Time for various population sizes}
+\label{fig:meanscore_v_runtime}
+\end{figure}
+
 
 
 \begin{figure}[ht]
 \centering
 \begin{subfigure}{0.5\textwidth}
 \centering
-\includegraphics[width=0.9\textwidth]{Figures/control_fitness}
+\includegraphics[width=1\textwidth]{Figures/control_fitness}
 \label{fig:control_fitness}
 \end{subfigure}%
 \begin{subfigure}{0.5\textwidth}
 \centering
-\includegraphics[width=0.9\textwidth]{Figures/final_fitness}
+\includegraphics[width=1\textwidth]{Figures/final_fitness}
 \label{fig:final_fitness}
 \end{subfigure}
 
