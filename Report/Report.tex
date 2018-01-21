@@ -5,7 +5,7 @@
 \usepackage{multirow}
 \usepackage{subcaption}
 \newcommand{\myparagraph}[1]{\paragraph{#1}\mbox{}\\}
- 
+
 \usepackage{xcolor}
 \newcommand{\highlight}[1]{\colorbox{yellow!50}{$\displaystyle#1$}}
 \hyphenpenalty=700
@@ -14,7 +14,7 @@
 \author{Y1481702}
 \date{\today}
 \setlength\parindent{0pt}
- 
+
 \begin{document}
 %FONT MUST BE SIZE 12 ARIAL.
 %Margin must be MIN 2cm
@@ -31,8 +31,8 @@
 
 
 % 15 marks
-\section{Introduction} 
-% Well written and clear 
+\section{Introduction}
+% Well written and clear
 % Connects well with the literature and provides relevant references
 % Demonstates synthesis of the literature
 % Demonstates critical ability
@@ -44,7 +44,7 @@ Biomimicry, the imitation of nature for solving human problems has produced many
 \\\\
 %TALK ABOUT THE BENEFITS OF BIOMIMICRY
 %Relate this back, why does EVCO benefit from biomimicry.
-Evolutionary Computation (EC) is a machine learning technique which is directly inspired by biological evolution. This is clearly another example of an imitation of nature's processes. 
+Evolutionary Computation (EC) is a machine learning technique which is directly inspired by biological evolution. This is clearly another example of an imitation of nature's processes.
 Life has been around on earth for over 3.5 billion years, this is a lot of research \& development time to produce useful solutions which can be related to many of the current problems in a wide range of fields. Through evolution, nature has already produced solutions to many of the hardest machine learning problems of today.
 
 Machine learning usually focuses on optimisation of a particular goal...? link this into the following-->
@@ -73,6 +73,7 @@ Starter sensing functions are given that tell the snake if there is a wall, itse
 % choices. Your should provide details and good rationale for your choices.
 \subsection{Technology}
 %INSERT LAB PC SPECS HERE
+All the described algorithms have been written in Python 2.7.12 and DEAP Version 1.2. They have been run using standard University of York Computer Science lab PCs running Ubuntu 16.04 and containing Quad-Core Intel Core i7-4770 and 16GB of RAM.
 
 \subsection{Representation}
 % Discussion of Genotype vs Phenotype mapping, or if traits are 1:1
@@ -80,7 +81,7 @@ Starter sensing functions are given that tell the snake if there is a wall, itse
 %LECTURE: 'Representation of the problem (encoding) can help to better understand the landscape of the problem.'
 %Representation can significantly affect the size of the search space and thus the time needed to search it
 %Compresses the model and thus it requires less storage space, this is good because..?
-The representation links the original problem to the search space over which the algorithm runs. As such, the type of representation chosen can significantly affect the size of the search space and by extension, the time needed to search it. 
+The representation links the original problem to the search space over which the algorithm runs. As such, the type of representation chosen can significantly affect the size of the search space and by extension, the time needed to search it.
 
 %Thoughts- obviously don't want to loose too much detail by having a representation that is TOO abstract -this will lead to bad solutions- CITATION NEEDED
 
@@ -135,11 +136,13 @@ Having the correct population size is crucial to success\cite{dynamic_population
 %fixed size or not? <--- probably, but WHY?! "In almost all EA applications the population size is constant and does not change during the evolutionary search." - Textbook WHY WHY WHY WHY?!?!?!! - citation needed
 %easier to encode in an array? <- not if size of individuals might grow?
 In almost all EA applications the population size is constant\cite[p. 20]{textbook}
-
+%TALK ABOUT DYNAMIC population sizes
 \\\\
-The algorithm was tested with varying population sizes to show the affect of this on the runtime and the fitness of the final individual produced. The algorithm was run 30 times for each population size, after each run the most fit individual was used to play 500 independent games. These results are shown in Table \ref{table:population_size} and by Figure \ref{}. The runtime values only include the time used for evolution, not for testing the final individual.
+The algorithm was tested with varying population sizes to show the affect of this on the runtime and the fitness of the final individual produced. The algorithm was run 30 times for each population size, after each run the most fit individual was used to play 500 independent games. These results are shown in Table \ref{table:population_size} and by Figure \ref{fig:meanscore_v_runtime}. The runtime values only include the time used for evolution, not for testing the final individual.
 \\\\
 The optimal size for the population is the size where a good solution is often produced but the program is quick to converge\cite{optimal_population_size}. However, the experimental data for this algorithm seems to suggest that, at least up to a population of 10,000, the greater the size of the population the better the results. %talk about further experiments needed to go beyond.
+
+It is worth noting that the control has a mutation value of 0, so it requires that the initial population contains a reasonable distribution of good individuals. Allowing mutation would allow novel ideas to be introduced later on in the evolution. This will be explored in Section \ref{mutation}.
 Due to limited compute resources and the timespan for this project, a population size of 1,000 will be used for the remainder of this report, unless stated otherwise.
 \\\\
 An interesting feature in the data is the significant increase in standard deviation as the population size increases. This shows that while larger populations help to produce individuals that perform better overall, this performance is not consistently across multiple games. This issue will be important to address later.
@@ -213,6 +216,7 @@ It has been shown that the order of a double tournament has no significant beari
 % Ongoing work into this may be interesting to talk about!
 
 \subsection{Variation Operators}
+% Describe how appropriate values for crossover and mutation were chosen to evolve the best agents,
 \subsubsection{Mutation}
 Mutation is the operator which incorporates new ideas into the population. Without it, genes would only be shuffled around and no new solutions could be found. %why is this bad..
 %relate this to the search space..?
@@ -221,7 +225,7 @@ Care needs to be taken when implementing mutation so as not to create biases. Th
 %How to prevent biases?
 
 \subsubsection{Recombination}
-%Crossover- 
+%Crossover-
 %IF GA, is this fixed point crossover??
 
 %multipoint crossover, uniform crossover, no crossover?
@@ -248,10 +252,7 @@ Certain number of generations..
 %SEE Discovering Statistics using R
 %SEE paper: Lecture 4 reading, A Practical Guide for Using Statistical Tests to Assess Randomized Algorithms in Software Testing
 
-%COMPARE to Blog and Paper?
-
-\subsection{Calibration}
-% Describe how appropriate values for crossover and mutation were chosen to evolve the best agents,
+%COMPARE to existing Blog and Paper snake solutions?
 
 \section{Conclusion} %[10 marks]
 % Well written and clear
@@ -260,7 +261,7 @@ Certain number of generations..
 % Connects well with the literature and provides relevant references
 % Demonstrates critical ability
 % Provides good suggestions for future work
-Significant 
+Significant
 
 
 %Has DEAP proved a good tool for this task?
@@ -283,27 +284,32 @@ Future work could also explore the adaptability of this program to perform well 
 \begin{center}
 \begin{tabular}{|l|l|l|l|r|}
 \hline%Add time taken?
-\textbf{Population Size} & \multicolumn{2}{c|}{\textbf{Run Time}} & \multicolumn{2}{c|}{\textbf{Average Test Run Score}} \\
+\textbf{Population Size} & \multicolumn{2}{c|}{\textbf{Run Time}} & \multicolumn{2}{c|}{\textbf{Mean Test Run Score}} \\
 \hline
 \multirow{3}{*}{100}
-& Mean & X & Mean & 2.66 \\
-& Max & Y & Max & 11.33 \\
-& St.Dev & Z & St.Dev & 2.12 \\
+& Mean & 6.59 & Mean & 2.76 \\
+& Max & 13.5 & Max & 11.60 \\
+& St.Dev & 2.52 & St.Dev & 2.14 \\
 \hline
 \multirow{3}{*}{250}
-& Mean & X & Mean & 5.16 \\
-& Max & Y & Max & 19.30 \\
-& St.Dev & Z & St.Dev & 3.38 \\
+& Mean & 17.7 & Mean & 4.67 \\
+& Max & 28.9 & Max & 18.8 \\
+& St.Dev & 4.22 & St.Dev & 3.48 \\
 \hline
 \multirow{3}{*}{500}
-& Mean & X & Mean & 5.96 \\
-& Max & Y & Max & 21.20 \\
-& St.Dev & Z & St.Dev & 3.96 \\
+& Mean & 43.39 & Mean & 5.81 \\
+& Max & 121.75 & Max & 21.97 \\
+& St.Dev & 18.55 & St.Dev & 3.99 \\
 \hline
-\multirow{3}{*}{1,000}
-& Mean & X & Mean & 7.99 \\
-& Max & Y & Max & 24.80 \\
-& St.Dev & Z & St.Dev & 4.81 \\
+\multirow{3}{*}{750}
+& Mean & 43.39 & Mean & 5.81 \\
+& Max & 121.75 & Max & 21.97 \\
+& St.Dev & 18.55 & St.Dev & 3.99 \\
+\hline
+\multirow{3}{*}{1000}
+& Mean & 78.59 & Mean & 6.97 \\
+& Max & 133.16 & Max & 24.20 \\
+& St.Dev & 21.63 & St.Dev & 4.61 \\
 \hline
 \multirow{3}{*}{2,500}
 & Mean & X & Mean & 11.98 \\
@@ -315,10 +321,10 @@ Future work could also explore the adaptability of this program to perform well 
 & Max & Y & Max & Y \\
 & St.Dev & Z & St.Dev & Z \\
 \hline
-\multirow{3}{*}{10,000}
-& Mean & X & Mean & Y \\
-& Max & Y & Max & Y \\
-& St.Dev & Z & St.Dev & Z \\
+\multirow{3}{*}{10000}
+& Mean & 1437.17 & Mean & 18.0 \\
+& Max & 39.27 & Max & 39.3 \\
+& St.Dev & 7.59 & St.Dev & 7.59 \\
 \hline
 \end{tabular}
 \end{center}
@@ -371,23 +377,30 @@ Future work could also explore the adaptability of this program to perform well 
 \label{fig:game_board}
 \end{figure}
 
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.8\textwidth]{Figures/meanscore_v_runtime}
+\caption{Mean Score against Run Time for various population sizes}
+\label{fig:meanscore_v_runtime}
+\end{figure}
+
 
 
 \begin{figure}[ht]
 \centering
 \begin{subfigure}{0.5\textwidth}
 \centering
-\includegraphics[width=0.9\textwidth]{Figures/control_fitness}
+\includegraphics[width=1\textwidth]{Figures/control_fitness}
 \label{fig:control_fitness}
 \end{subfigure}%
 \begin{subfigure}{0.5\textwidth}
 \centering
-\includegraphics[width=0.9\textwidth]{Figures/final_fitness}
+\includegraphics[width=1\textwidth]{Figures/final_fitness}
 \label{fig:final_fitness}
 \end{subfigure}
 
 \caption{Fitness of final algorithms.}
 \label{fig:fitness_comparison}
 \end{figure}
- 
+
 \end{document}

@@ -18,10 +18,10 @@ from deap import gp
 from deap import tools
 from functools import partial
 
-EVAL_RUNS = 1
-#POP_SIZE = 5000
+EVAL_RUNS = 3
+POP_SIZE = 5000
 TOTAL_GENS = 250
-MUT_PB = 0
+MUT_PB = 0.1
 CRX_PB = 0.8
 
 
@@ -31,7 +31,7 @@ NFOOD = 1 # NOTE: YOU MAY NEED TO ADD A CHECK THAT THERE ARE ENOUGH SPACES LEFT 
 
 def if_then_else(condition, out1, out2):
 	out1() if condition() else out2()
-	
+
 # This class can be used to create a basic player object (snake agent)
 class SnakePlayer(list):
 	global S_RIGHT, S_LEFT, S_UP, S_DOWN
@@ -136,7 +136,7 @@ class SnakePlayer(list):
 	#tail is ahead in any cell along this row!
 	def sense_tail_before_food(self):
 		self.getAheadLocation()
-		
+
 		#up/down is FIRST coordinate
 		#origin (0, 0) is top/left
 		for item in self.food:
@@ -151,7 +151,7 @@ class SnakePlayer(list):
 					for y in range(self.ahead[0], item[0]):
 						if [y, item[1]] in self.body[1:]:
 							return True
-				
+
 		return False
 
 	#food can be ahead in any cell along this row!
@@ -165,7 +165,7 @@ class SnakePlayer(list):
 				if (item[0] <= self.ahead[0] and
 				   item[1] == self.ahead[1]):
 					return True
-					
+
 			elif self.direction == S_DOWN:
 				if (item[0] >= self.ahead[0] and
 					item[1] == self.ahead[1]):
@@ -175,7 +175,7 @@ class SnakePlayer(list):
 				if (item[0] == self.ahead[0] and
 					item[1] >= self.ahead[1]):
 					return True
-					
+
 			elif self.direction == S_LEFT:
 				if (item[0] == self.ahead[0] and
 					item[1] <= self.ahead[1]):
@@ -220,16 +220,16 @@ class SnakePlayer(list):
 	def if_food_right(self, out1, out2):
 		return partial(if_then_else, lambda: self.body[0][1] < self.food[0][1], out1, out2)
 
-	#movement checks- to compensate for different terminal functionality in this variant	
+	#movement checks- to compensate for different terminal functionality in this variant
 	def if_moving_right(self, out1, out2):
 		return partial(if_then_else, lambda: self.direction == S_RIGHT, out1, out2)
-		
+
 	def if_moving_left(self, out1, out2):
 		return partial(if_then_else, lambda: self.direction == S_LEFT, out1, out2)
-		
+
 	def if_moving_up(self, out1, out2):
 		return partial(if_then_else, lambda: self.direction == S_UP, out1, out2)
-	
+
 	def if_moving_down(self, out1, out2):
 		return partial(if_then_else, lambda: self.direction == S_DOWN, out1, out2)
 
@@ -291,7 +291,7 @@ def displayStrategyRun(individual):
 			food = placeFood(snake)
 			for f in food: win.addch(f[0], f[1], '@')
 			timer = 0
-		else:    
+		else:
 			last = snake.body.pop()
 			win.addch(last[0], last[1], ' ')
 			timer += 1 # timesteps since last eaten
@@ -319,9 +319,9 @@ def displayRunPythonista(individual):
 
 	timer = 0
 	collided = False
-	
+
 	endline = "-" * (XSIZE + 2)
-	
+
 	while not collided and not timer == ((2*XSIZE) * YSIZE):
 		time.sleep(0.3)
 		# Set up the display
@@ -348,7 +348,7 @@ def displayRunPythonista(individual):
 			snake.score += 1
 			food = placeFood(snake)
 			timer = 0
-		else:    
+		else:
 			last = snake.body.pop()
 			timer += 1 # timesteps since last eaten
 
@@ -386,14 +386,14 @@ def runGame(individual):
 			snake.score += 1
 			food = placeFood(snake)
 			timer = 0
-		else:    
+		else:
 			snake.body.pop()
 			timer += 1 # timesteps since last eaten
 
 	return snake.score,
 
 #BASIC EA SET UP
-creator.create("Fitness", base.Fitness, weights=(-1.0,))
+creator.create("Fitness", base.Fitness, weights=(1.0,))
 creator.create("Individual", gp.PrimitiveTree, fitness=creator.Fitness)
 
 pset = gp.PrimitiveSet("MAIN", 0)
@@ -414,7 +414,7 @@ pset.addPrimitive(snake.if_danger_ahead, 2)
 pset.addPrimitive(snake.if_danger_left, 2)
 pset.addPrimitive(snake.if_danger_right, 2)
 pset.addPrimitive(snake.if_food_ahead, 2)
-#pset.addPrimitive(snake.if_tail_before_food, 2)
+pset.addPrimitive(snake.if_tail_before_food, 2)
 pset.addPrimitive(snake.if_danger_two_ahead, 2)
 
 
@@ -472,7 +472,7 @@ def evaluate_factorial(individual):
 	return (total / EVAL_RUNS),
 
 
-toolbox.register("evaluate", eval)
+toolbox.register("evaluate", evaluate_factorial)
 
 toolbox.register("select", tools.selTournament, tournsize=3)
 #toolbox.register("select", tools.selDoubleTournament,
@@ -496,69 +496,63 @@ def main():
 
 	## THIS IS WHERE YOUR CORE EVOLUTIONARY ALGORITHM WILL GO #
 	#random.seed(318)
+	pop = toolbox.population(n=POP_SIZE)
+	hof = tools.HallOfFame(5)
 
-	for POP_SIZE in [2500, 5000, 10000]:
-		print("Population Size: " + str(POP_SIZE))
-		for i in range(30):
-			pop = toolbox.population(n=POP_SIZE)
-			hof = tools.HallOfFame(5)
+	stats_fit = tools.Statistics(lambda ind: ind.fitness.values)
+	stats_size = tools.Statistics(len)
+	mstats = tools.MultiStatistics(fitness=stats_fit, size=stats_size)
+	mstats.register("avg", lambda val: round(numpy.mean(val), 2))
+	mstats.register("std", lambda val: round(numpy.std(val), 2))
+	mstats.register("min", numpy.min)
+	mstats.register("max", numpy.max)
 
-			print("Run " + str(i))
+	start = timer()
 
-			stats_fit = tools.Statistics(lambda ind: ind.fitness.values)
-			stats_size = tools.Statistics(len)
-			mstats = tools.MultiStatistics(fitness=stats_fit, size=stats_size)
-			mstats.register("avg", lambda val: round(numpy.mean(val), 2))
-			mstats.register("std", lambda val: round(numpy.std(val), 2))
-			mstats.register("min", numpy.min)
-			mstats.register("max", numpy.max)
+	try:
+		pop, log = algorithms.eaSimple(
+			pop,
+			toolbox,
+			CRX_PB,  # CHANCE OF CROSSOVER
+			MUT_PB,  # CHANCE OF MUTATION
+			TOTAL_GENS,  # NO Generations
+			halloffame=hof,
+			verbose=True,
+			stats=mstats
+		)
+	except KeyboardInterrupt:
+		pool.terminate()
+		pool.join()
+		raise KeyboardInterrupt
 
-			start = timer()
+	end = timer()
 
-			try:
-				pop, log = algorithms.eaSimple(
-					pop,
-					toolbox,
-					CRX_PB,  # CHANCE OF CROSSOVER
-					MUT_PB,  # CHANCE OF MUTATION
-					TOTAL_GENS,  # NO Generations
-					halloffame=hof,
-					verbose=True,
-					stats=mstats
-				)
-			except KeyboardInterrupt:
-				pool.terminate()
-				pool.join()
-				raise KeyboardInterrupt
+	# Total score as..
+	# Attempt parsimony length prevention first
+	best = tools.selBest(pop, 1)
+	for ind in best:
+		#runs = []
+		for run in range(500):
+			displayStrategyRun(ind)
+			#runs.append(runGame(ind)[0])
 
-			end = timer()
+		#time_log = open("Statistics/Population/Fitness.txt", "a+")
+		#time_log.write("Population Size: " + str(POP_SIZE) + "\n")
+		#time_log.write("Run " + str(i) + "\n")
+		#time_log.write("Elapsed: " + str(end - start))
+		#time_log.write(str(runs) + "\n")
+		#time_log.write(str(max(runs)) + "\n")
+		#time_log.write(str(numpy.mean(runs)) + "\n")
+		#time_log.write(str(numpy.std(runs)) + "\n\n")
+		#time_log.close()
+		#print(runs)
+		#print(max(runs))
+		#print("Elapsed: " + str(end - start))
+		#print(numpy.mean(runs))
+		#print(numpy.std(runs))
+		#print
+		#print(runGame(ind))
 
-			# Total score as..
-			# Attempt parsimony length prevention first
-			best = tools.selBest(pop, 1)
-			for ind in best:
-				runs = []
-				for run in range(500):
-					runs.append(runGame(ind)[0])
 
-				time_log = open("Statistics/Population/Fitness.txt", "a+")
-				time_log.write("Population Size: " + str(POP_SIZE) + "\n")
-				time_log.write("Run " + str(i) + "\n")
-				time_log.write("Elapsed: " + str(end - start))
-				time_log.write(str(runs) + "\n")
-				time_log.write(str(max(runs)) + "\n")
-				time_log.write(str(numpy.mean(runs)) + "\n")
-				time_log.write(str(numpy.std(runs)) + "\n\n")
-				time_log.close()
-				print(runs)
-				print(max(runs))
-				print("Elapsed: " + str(end - start))
-				print(numpy.mean(runs))
-				print(numpy.std(runs))
-				print
-				#	displayStrategyRun(ind)
-				#print(runGame(ind))
-
-			
 
 main()

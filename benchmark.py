@@ -10,6 +10,7 @@ from timeit import default_timer as timer
 import pickle
 
 import matplotlib.pyplot as plt
+import multiprocessing
 
 from deap import algorithms
 from deap import base
@@ -19,8 +20,8 @@ from deap import tools
 from functools import partial
 
 EVAL_RUNS = 1
-POP_SIZE = 10000
-TOTAL_GENS = 500
+POP_SIZE = 2500
+TOTAL_GENS = 250
 MUT_PB = 0
 CRX_PB = 0.8
 
@@ -30,7 +31,7 @@ NFOOD = 1 # NOTE: YOU MAY NEED TO ADD A CHECK THAT THERE ARE ENOUGH SPACES LEFT 
 
 def if_then_else(condition, out1, out2):
 	out1() if condition() else out2()
-	
+
 # This class can be used to create a basic player object (snake agent)
 class SnakePlayer(list):
 	global S_RIGHT, S_LEFT, S_UP, S_DOWN
@@ -130,7 +131,7 @@ class SnakePlayer(list):
 			right[1] -= 1
 		elif self.direction == S_LEFT:
 			right[1] += 1
-			
+
 		return self.is_tail(right) or self.is_wall(right)
 
 	#food can be ahead in any cell along this row!
@@ -197,16 +198,16 @@ class SnakePlayer(list):
 	def if_food_right(self, out1, out2):
 		return partial(if_then_else, lambda: self.body[0][1] < self.food[0][1], out1, out2)
 
-	#movement checks- to compensate for different terminal functionality in this variant	
+	#movement checks- to compensate for different terminal functionality in this variant
 	def if_moving_right(self, out1, out2):
 		return partial(if_then_else, lambda: self.direction == S_RIGHT, out1, out2)
-		
+
 	def if_moving_left(self, out1, out2):
 		return partial(if_then_else, lambda: self.direction == S_LEFT, out1, out2)
-		
+
 	def if_moving_up(self, out1, out2):
 		return partial(if_then_else, lambda: self.direction == S_UP, out1, out2)
-	
+
 	def if_moving_down(self, out1, out2):
 		return partial(if_then_else, lambda: self.direction == S_DOWN, out1, out2)
 
@@ -256,7 +257,7 @@ def displayStrategyRun(individual):
 		# Set up the display
 		win.border(0)
 		win.addstr(0, 2, 'Score : ' + str(snake.score) + ' ')
- 		win.getch()
+		win.getch()
 
 		## EXECUTE THE SNAKE'S BEHAVIOUR HERE ##
 		routine()
@@ -268,7 +269,7 @@ def displayStrategyRun(individual):
 			food = placeFood(snake)
 			for f in food: win.addch(f[0], f[1], '@')
 			timer = 0
-		else:    
+		else:
 			last = snake.body.pop()
 			win.addch(last[0], last[1], ' ')
 			timer += 1 # timesteps since last eaten
@@ -296,15 +297,15 @@ def displayRunPythonista(individual):
 
 	timer = 0
 	collided = False
-	
+
 	endline = "-" * (XSIZE + 2)
-	
+
 	while not collided and not timer == ((2*XSIZE) * YSIZE):
 		time.sleep(0.3)
 		# Set up the display
 		console.clear()
 		print(0, 2, 'Score : ' + str(snake.score) + ' ')
-		print endline
+		print(endline)
 		for x in range(XSIZE):
 			line = "|"
 			for y in range(YSIZE):
@@ -314,8 +315,8 @@ def displayRunPythonista(individual):
 					line += "@"
 				else:
 					line += " "
-			print line + "|"
-		print endline
+			print(line + "|")
+		print(endline)
 
 		## EXECUTE THE SNAKE'S BEHAVIOUR HERE ##
 		routine()
@@ -325,7 +326,7 @@ def displayRunPythonista(individual):
 			snake.score += 1
 			food = placeFood(snake)
 			timer = 0
-		else:    
+		else:
 			last = snake.body.pop()
 			timer += 1 # timesteps since last eaten
 
@@ -364,7 +365,7 @@ def runGame(individual):
 			snake.score += 1
 			food = placeFood(snake)
 			timer = 0
-		else:    
+		else:
 			snake.body.pop()
 			timer += 1 # timesteps since last eaten
 
@@ -443,8 +444,6 @@ for type in ["mate", "mutate"]:
 		gp.staticLimit(key=operator.attrgetter("height"), max_value=17)
 	)
 
-time_log = open("Statistics/Baseline/Timing.txt", "a")
-
 def main():
 	global time_log
 	global snake
@@ -455,7 +454,8 @@ def main():
 	mean_fit = []
 	max_fit = []
 
-	for i in range(30):
+	for i in range(26, 30):
+		time_log = open("Statistics/Labs/"+ str(POP_SIZE) +"/Timing.txt", "a+")
 		time_log.write("Run " + str(i) + "\n")
 		start = timer()
 		time_log.write("Start: " + str(start) + "\n")
@@ -491,7 +491,7 @@ def main():
 		time_log.write("End: " + str(end) + "\n")
 		time_log.write("Elapsed: " +  str(end - start) + "\n")
 
-		lb_file = open("Statistics/Baseline/Run "+str(i)+".txt", "wb")
+		lb_file = open("Statistics/Labs/"+ str(POP_SIZE) +"/Run "+str(i)+".txt", "wb")
 		pickle.dump(log, lb_file)
 		lb_file.close()
 
@@ -506,23 +506,22 @@ def main():
 			scores = []
 			for i in range(500):
 				scores.append(runGame(ind)[0])
-			print
+			print()
 			print(scores)
 			time_log.write("Scores: " + str(scores) + "\n\n")
+		time_log.close()
+	#x = range(TOTAL_GENS + 1)
+	#y1np = numpy.array(mean_fit)
+	#y1 = y1np.mean(axis=0)
+	#y2 = max(max_fit)
 
-	x = range(TOTAL_GENS + 1)
-	y1np = numpy.array(mean_fit)
-	y1 = y1np.mean(axis=0)
-	y2 = max(max_fit)
-	
-	plt.plot(x, y1, label="Mean Fitness")
-	plt.plot(x, y2, label="Most Fit")
-	plt.title("Fitness Progress through Generations")
-	plt.xlabel("Generation")
-	plt.ylabel("Fitness")
-	plt.legend(loc='lower left')
-	plt.savefig("fitness_benchmark.png")
+	#plt.plot(x, y1, label="Mean Fitness")
+	#plt.plot(x, y2, label="Most Fit")
+	#plt.title("Fitness Progress through Generations")
+	#plt.xlabel("Generation")
+	#plt.ylabel("Fitness")
+	#plt.legend(loc='lower left')
+	#plt.savefig("fitness_benchmark.png")
 	#plt.show()
 
 main()
-time_log.close()
