@@ -20,7 +20,7 @@ from deap import tools
 from functools import partial
 
 EVAL_RUNS = 1
-POP_SIZE = 2500
+POP_SIZE = 750
 TOTAL_GENS = 250
 MUT_PB = 0
 CRX_PB = 0.8
@@ -454,7 +454,7 @@ def main():
 	mean_fit = []
 	max_fit = []
 
-	for i in range(26, 30):
+	for i in range(30):
 		time_log = open("Statistics/Labs/"+ str(POP_SIZE) +"/Timing.txt", "a+")
 		time_log.write("Run " + str(i) + "\n")
 		start = timer()
