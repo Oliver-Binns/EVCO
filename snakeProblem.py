@@ -19,9 +19,9 @@ from deap import tools
 from functools import partial
 
 EVAL_RUNS = 3
-POP_SIZE = 5000
-TOTAL_GENS = 250
-MUT_PB = 0.1
+POP_SIZE = 1000
+TOTAL_GENS = 75
+MUT_PB = 0.0
 CRX_PB = 0.8
 
 
@@ -279,7 +279,7 @@ def displayStrategyRun(individual):
 		# Set up the display
 		win.border(0)
 		win.addstr(0, 2, 'Score : ' + str(snake.score) + ' ')
- 		win.getch()
+		win.getch()
 
 		## EXECUTE THE SNAKE'S BEHAVIOUR HERE ##
 		routine()
@@ -304,7 +304,7 @@ def displayStrategyRun(individual):
 	print("Score:", snake.score)
 	print("Collided: ", collided)
 	print("Hit Bounds:", hitBounds)
-	raw_input("Press to continue...")
+	input("Press to continue...")
 
 	return snake.score,
 
@@ -327,7 +327,7 @@ def displayRunPythonista(individual):
 		# Set up the display
 		console.clear()
 		print(0, 2, 'Score : ' + str(snake.score) + ' ')
-		print endline
+		print(endline)
 		for x in range(XSIZE):
 			line = "|"
 			for y in range(YSIZE):
@@ -337,8 +337,8 @@ def displayRunPythonista(individual):
 					line += "@"
 				else:
 					line += " "
-			print line + "|"
-		print endline
+			print(line + "|")
+		print(endline)
 
 		## EXECUTE THE SNAKE'S BEHAVIOUR HERE ##
 		routine()
@@ -358,7 +358,7 @@ def displayRunPythonista(individual):
 	print("Score:", snake.score)
 	print("Collided: ", collided)
 	print("Hit Bounds:", hitBounds)
-	raw_input("Press to continue...")
+	input("Press to continue...")
 
 	return snake.score,
 
@@ -434,7 +434,7 @@ pset.addTerminal(snake.changeDirectionLeft)
 pset.addTerminal(snake.changeDirectionRight)
 
 toolbox = base.Toolbox()
-toolbox.register("expr", gp.genHalfAndHalf, pset=pset, min_=4, max_=7)
+toolbox.register("expr", gp.genHalfAndHalf, pset=pset, min_=4, max_=8)
 toolbox.register("individual", tools.initIterate, creator.Individual, toolbox.expr)
 toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 toolbox.register("compile", gp.compile, pset=pset)

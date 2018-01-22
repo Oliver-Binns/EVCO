@@ -56,16 +56,17 @@ y1 = y1np.mean(axis=1)
 
 fig, axis = plt.subplots()
 axis2 = axis.twinx()
-axis.plot(POPS, y1, label="Run Times", color="g")
+l1, = axis.plot(POPS, y1, "-o", label="Run Times", color="g")
+
 axis.set_ylabel("Time (Seconds)")
-axis2.plot(POPS, all_scores, label="Mean Score", color="b")
-axis2.set_ylabel("Fitness")
+l2, = axis2.plot(POPS, all_scores, "-o", label="Mean Score", color="b")
+axis2.set_ylabel("Test Run Score")
 
 plt.title("Mean Score and Run Time for Various Population Sizes")
 
 plt.xlabel("Population Size")
+plt.legend([l1, l2], ["Run Time", "Mean Score"], loc='lower right')
 #plt.xscale('log')
-plt.legend(loc='lower right')
 
 def color_y_axis(ax, color):
     """Color your axes."""
