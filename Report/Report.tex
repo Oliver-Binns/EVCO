@@ -27,8 +27,8 @@
 % Submit Code, 5 marks
 % Must be a 'good final solution' and run on a test set
 
-%\section{Abstract} %Unmarked - is it necessary?
-
+%\section{Abstract} %Unmarked - is it necessary? YES this is supposed to mirror a research paper
+\section{Abstract}
 
 % 15 marks
 \section{Introduction}
@@ -46,7 +46,7 @@ Biomimicry, the imitation of nature for solving human problems has produced many
 %Relate this back, why does EVCO benefit from biomimicry.
 Evolutionary Computation (EC) is a machine learning technique which is directly inspired by biological evolution. This is clearly another example of an imitation of nature's processes.
 Life has been around on earth for over 3.5 billion years, this is a lot of research \& development time to produce useful solutions which can be related to many of the current problems in a wide range of fields. Through evolution, nature has already produced solutions to many of the hardest machine learning problems of today.
-
+\\\\
 Machine learning usually focuses on optimisation of a particular goal...? link this into the following-->
 %Excerpt from Biomimicry: This "hill climbing" in a landscape of possibilities towards an optimal design is what engineers do, but computers can generate random ideas much faster than most engineers. And computers, not yet able to feel embarassment or peer pressure, are not afraid to try off-the-wall ideas. Ideas are just ideas; the more the merrier. page 209
 
@@ -116,36 +116,35 @@ Several sensing functions have been given in the problem definition which all re
 %Textbook: An important category of GP applications arises in contexts where executing a given expression changes the environment.
 % ... THIS IS THE CASE IN SNAKE? See textbook Chap 6.10
 This application of GP fits into a specific category involving a physical enviroment, which in this case is simulated. The added difficulty comes from the fact that the execution of any terminal element may change the environment. Once this change has been made, the subsequent execution may produce a different effect in the environment. In this kind of application the internal EA mechanics remains the same, but fitness evalutation can be significantly more computationally expensive\cite[p. 110]{textbook} in order to get a fair representation. In this example, as with the control, the fitness of a particular program will need to be determined over a full game, instead of a single turn. This will be discussed further in Section \ref{fitness_evaluation}.
-
+\\\\
 % <--------
 %rename section "Function Set", add "Terminal Set section"
 %Which additional sensing functions (if any) have been implemented?
 Previous work has shown that the function set can help to find a better solution, however we need to be careful of overparameterising the problem.%cite for this
 This is a common trade-off in many forms of machine learning?
 %see function set experiment conducted in paper! - take results from this?
-The control code has an expanded function set from the original brief\ref{table:function_set}.
+The control code has an expanded function set from the original brief
+\ref{table:function_set}.
 
 \subsubsection{Initialisation Procedure}
+Ramped Half and Half will be used as it provides the greatest diversity in initial population
 %Full/Grow/Ramped Half and Half?
 
 \subsection{Population}
 \subsubsection{Size}
 \label{population_size}
-Having the correct population size is crucial to success\cite{dynamic_population}. The size of the population needs to be large enough to explore a significant amount of the search space by containing a number of promising individuals. If this is not the case, a large amount of mutation will be required to find any good solutions creating a very unstable solution. Too large a population will significantly impact the algorithm's performance. As the population size tends towards the size of the search space, the algorithm becomes no better than a brute force solution, running unnecessarily slowly. It has also been mathematically proved that, for certain problems, a larger population is highly likely lead to a sub-optimal solution if the problem has an attraction basin near some local optimum\cite{unhelpful_large_populations}.
+Having the correct population size is crucial to success\cite{dynamic_population_size}. The size of the population needs to be large enough to explore a significant amount of the search space by containing a number of promising individuals. If this is not the case, a large amount of mutation will be required to find any good solutions creating a very unstable solution. Too large a population will significantly impact the algorithm's performance. As the population size tends towards the size of the search space, the algorithm becomes no better than a brute force solution, running unnecessarily slowly. It has also been mathematically proved that, for certain problems, a larger population is highly likely lead to a sub-optimal solution if the problem has an attraction basin near some local optimum\cite{unhelpful_large_populations}.
 \\\\
 %fixed size or not? <--- probably, but WHY?! "In almost all EA applications the population size is constant and does not change during the evolutionary search." - Textbook WHY WHY WHY WHY?!?!?!! - citation needed
 %easier to encode in an array? <- not if size of individuals might grow?
 In almost all EA applications the population size is constant\cite[p. 20]{textbook}
-%TALK ABOUT DYNAMIC population sizes
+%TALK ABOUT DYNAMIC population sizes in Spinosa \cite{dynamic_population_size}
 \\\\
-The algorithm was tested with varying population sizes to show the affect of this on the runtime and the fitness of the final individual produced. The algorithm was run 30 times for each population size, after each run the most fit individual was used to play 500 independent games. These results are shown in Table \ref{table:population_size} and by Figure \ref{fig:meanscore_v_runtime}. The runtime values only include the time used for evolution, not for testing the final individual.
+The algorithm was tested with varying population sizes to show the affect of this on the runtime and the fitness of the final individual produced. The algorithm was run 30 times for each population size, the runtime and fitness values for this are shown in Table \ref{table:population_size} and by Figure \ref{fig:pop_convergence}. After each run, the most fit individual was used to play 500 independent game, these results are shown in Table \ref{table:population_size} and by Figure \ref{fig:meanscore_v_runtime}. The runtime values only include the time used for evolution, not for testing the final individual.
 \\\\
-The optimal size for the population is the size where a good solution is often produced but the program is quick to converge\cite{optimal_population_size}. However, the experimental data for this algorithm seems to suggest that, at least up to a population of 10,000, the greater the size of the population the better the results. %talk about further experiments needed to go beyond.
-
-It is worth noting that the control has a mutation value of 0, so it requires that the initial population contains a reasonable distribution of good individuals. Allowing mutation would allow novel ideas to be introduced later on in the evolution. This will be explored in Section \ref{mutation}.
-Due to limited compute resources and the timespan for this project, a population size of 1,000 will be used for the remainder of this report, unless stated otherwise.
+It is worth noting that the control has a mutation value of 0, so it requires that the initial population contains a reasonable distribution of good individuals. Adding mutation would allow novel ideas to be introduced later on in the evolution. This is likely why larger populations perform significantly better with this control algorithm and will be explored later in Section \ref{mutation}. Another interesting feature in the data is the significant increase in standard deviation as the population size increases. This shows that while larger populations help to produce individuals that perform better overall, this performance is not consistently across multiple games. This issue will be important to address later.
 \\\\
-An interesting feature in the data is the significant increase in standard deviation as the population size increases. This shows that while larger populations help to produce individuals that perform better overall, this performance is not consistently across multiple games. This issue will be important to address later.
+The optimal size for the population is the size where a good solution is often produced but the program is quick to converge\cite{optimal_population_size}. A population of 1,000 seems to give a solution that is reasonably quick to converge (approx. 50 generations, Fig. \ref{fig:pop_convergence}) but also produces a reasonable score across multiple games (around 6.97, \ref{table:population_size}). This size of population will mean that proposed changes to the algorithm in this paper can be tested in a reasonable amount of time even with the limited timespan for the project and available computing resources.
 
 \subsubsection{Diversity}
 Within this evolutionary computation task, each individual of the population corresponds to a point in the search space of all possible programs. %a section of the search space that is showing promising results
@@ -218,6 +217,7 @@ It has been shown that the order of a double tournament has no significant beari
 \subsection{Variation Operators}
 % Describe how appropriate values for crossover and mutation were chosen to evolve the best agents,
 \subsubsection{Mutation}
+\label{mutation}
 Mutation is the operator which incorporates new ideas into the population. Without it, genes would only be shuffled around and no new solutions could be found. %why is this bad..
 %relate this to the search space..?
 A trade-off is required here, too much mutation will result in a highly unstable algorithm. Far too much mutation would %move this to calibration section perhaps?
@@ -263,12 +263,13 @@ Certain number of generations..
 % Provides good suggestions for future work
 Significant
 
-
 %Has DEAP proved a good tool for this task?
 %pros/cons?
 
 \subsection{Further Work}
 The complexity and diversity of the snake game can lead into plenty of areas for further exploration. Recent developments in evolutionary computation such as co-evolution and neuroevolution could be explored in the context of this task. With co-evolution individuals would have to compete in order to get to the food items first, creating snake players that find the food faster.
+\\\\
+A snake that cycles through each square will always each piece of food as it traverses. An alternative implementation of this algorithm could have a function set with no information of the position of the food, but reward the snake using a fitness function based on the number of unique squares visited before returning to the start position. This alternative algorithm could be compared to the one described in this report to determine which approach is best.
 \\\\
 Future work could also explore the adaptability of this program to perform well across the wide number of variants of the game that exist with different formats and rules. This could be further expanded to attempt to create individuals that generalise across multiple game variants and carry their learning across in the way a human player would.
 
@@ -302,9 +303,9 @@ Future work could also explore the adaptability of this program to perform well 
 & St.Dev & 18.55 & St.Dev & 3.99 \\
 \hline
 \multirow{3}{*}{750}
-& Mean & 43.39 & Mean & 5.81 \\
-& Max & 121.75 & Max & 21.97 \\
-& St.Dev & 18.55 & St.Dev & 3.99 \\
+& Mean & X & Mean & 5.81 \\
+& Max & Y & Max & 21.97 \\
+& St.Dev & Z & St.Dev & 3.99 \\
 \hline
 \multirow{3}{*}{1000}
 & Mean & 78.59 & Mean & 6.97 \\
@@ -312,14 +313,14 @@ Future work could also explore the adaptability of this program to perform well 
 & St.Dev & 21.63 & St.Dev & 4.61 \\
 \hline
 \multirow{3}{*}{2,500}
-& Mean & X & Mean & 11.98 \\
-& Max & Y & Max & 32.07 \\
-& St.Dev & Z & St.Dev & 6.36 \\
+& Mean & 249.24 & Mean & 10.73 \\
+& Max & 518.06 & Max & 29.40 \\
+& St.Dev & 83.79 & St.Dev & 5.73 \\
 \hline
 \multirow{3}{*}{5,000}
-& Mean & X & Mean & Y \\
-& Max & Y & Max & Y \\
-& St.Dev & Z & St.Dev & Z \\
+& Mean & 572.78 & Mean & 13.99 \\
+& Max & 997.97 & Max & 33.83 \\
+& St.Dev & 185.05 & St.Dev & 6.64 \\
 \hline
 \multirow{3}{*}{10000}
 & Mean & 1437.17 & Mean & 18.0 \\
@@ -333,11 +334,40 @@ Future work could also explore the adaptability of this program to perform well 
 \end{table}
 
 
+
+\begin{table}[h]
+\begin{center}
+\begin{tabular}{|l|l|l|l|r|}
+\hline%Add time taken?
+\textbf{Initialisation Procedure} & \multicolumn{2}{c|}{\textbf{Mean Initial Fitness}} & \multicolumn{2}{c|}{\textbf{Test Run Score}} \\
+\hline
+\multirow{3}{*}{Grow}
+& Mean & 6.59 & Mean & 2.76 \\
+& Max & 13.5 & Max & 11.60 \\
+& St.Dev & 2.52 & St.Dev & 2.14 \\
+\hline
+\multirow{3}{*}{Half and Half}
+& Mean & 17.7 & Mean & 4.67 \\
+& Max & 28.9 & Max & 18.8 \\
+& St.Dev & 4.22 & St.Dev & 3.48 \\
+\hline
+\multirow{3}{*}{Full}
+& Mean & 17.7 & Mean & 4.67 \\
+& Max & 28.9 & Max & 18.8 \\
+& St.Dev & 4.22 & St.Dev & 3.48 \\
+\hline
+\end{tabular}
+\end{center}
+\caption{Varying Initialisation Procedure}
+\label{table:initialisation}
+\end{table}
+
+
 \begin{table}[h]
 \begin{center}
 \begin{tabular}{|l|l|l|r|}
 \hline%Add time taken?
-\textbf{Evaluation} & \textbf{Description} & \multicolumn{2}{c|}{\textbf{Test Runs}} \\
+\textbf{Evaluation} & \textbf{Description} & \multicolumn{2}{c|}{\textbf{Test Run Score}} \\
 \hline
 \multirow{3}{*}{Score} & \multirow{4}{*}{description here}
 & Mean & X \\
@@ -379,9 +409,21 @@ Future work could also explore the adaptability of this program to perform well 
 
 \begin{figure}[ht]
 \centering
-\includegraphics[width=0.8\textwidth]{Figures/meanscore_v_runtime}
-\caption{Mean Score against Run Time for various population sizes}
+\begin{subfigure}{0.5\textwidth}
+\centering
+\includegraphics[width=1\textwidth]{Figures/convergence}
+\caption{Mean Fitness across Generations}
+\label{fig:pop_convergence}
+\end{subfigure}%
+\begin{subfigure}{0.5\textwidth}
+\centering
+\includegraphics[width=1\textwidth]{Figures/meanscore_v_runtime}
+\caption{Mean Final Score and Run Time}
 \label{fig:meanscore_v_runtime}
+\end{subfigure}
+
+\caption{Varying Population Size}
+\label{fig:varying_population_size}
 \end{figure}
 
 
@@ -391,11 +433,13 @@ Future work could also explore the adaptability of this program to perform well 
 \begin{subfigure}{0.5\textwidth}
 \centering
 \includegraphics[width=1\textwidth]{Figures/control_fitness}
+\caption{Control}
 \label{fig:control_fitness}
 \end{subfigure}%
 \begin{subfigure}{0.5\textwidth}
 \centering
 \includegraphics[width=1\textwidth]{Figures/final_fitness}
+\caption{Final Algorithm}
 \label{fig:final_fitness}
 \end{subfigure}
 
