@@ -10,6 +10,8 @@ import time
 from timeit import default_timer as timer
 
 import matplotlib.pyplot as plt
+import networkx as nx
+from networkx.drawing.nx_agraph import graphviz_layout
 
 from deap import algorithms
 from deap import base
@@ -18,11 +20,12 @@ from deap import gp
 from deap import tools
 from functools import partial
 
-EVAL_RUNS = 5
+EVAL_RUNS = 1
 POP_SIZE = 1000
 TOTAL_GENS = 75
-MUT_PB = 0.2
-CRX_PB = 0.8
+MUT_PB = 0.7
+CRX_PB = 0.7
+DEPTH_LIMIT = 7
 
 
 S_RIGHT, S_LEFT, S_UP, S_DOWN = 0,1,2,3
@@ -276,7 +279,7 @@ def displayStrategyRun(individual):
 	timer = 0
 	collided = False
 	while not collided and not timer == ((2*XSIZE) * YSIZE):
-		time.sleep(0.15)
+		time.sleep(0.05)
 		# Set up the display
 		win.border(0)
 		win.addstr(0, 2, 'Score : ' + str(snake.score) + ' ')
@@ -421,6 +424,10 @@ def runGameFib(individual):
 			snake.body.pop()
 			timer += 1 # timesteps since last eaten
 
+	#punish snake if it goes into a wall, this should always be avoided
+	if snake.is_wall(snake.body[0]):
+		return 0,
+
 	return snake.score,
 
 #BASIC EA SET UP
@@ -453,18 +460,23 @@ pset.addPrimitive(snake.if_food_down, 2)
 pset.addPrimitive(snake.if_food_left, 2)
 pset.addPrimitive(snake.if_food_right, 2)
 
-pset.addPrimitive(snake.if_moving_up, 2)
-pset.addPrimitive(snake.if_moving_down, 2)
-pset.addPrimitive(snake.if_moving_right, 2)
-pset.addPrimitive(snake.if_moving_left, 2)
+#Removing these seems to double the average score
+#pset.addPrimitive(snake.if_moving_up, 2)
+#pset.addPrimitive(snake.if_moving_down, 2)
+#pset.addPrimitive(snake.if_moving_right, 2)
+#pset.addPrimitive(snake.if_moving_left, 2)
 
+def no_action():
+	pass
+
+pset.addTerminal(no_action)
 pset.addTerminal(snake.changeDirectionUp)
 pset.addTerminal(snake.changeDirectionDown)
 pset.addTerminal(snake.changeDirectionLeft)
 pset.addTerminal(snake.changeDirectionRight)
 
 toolbox = base.Toolbox()
-toolbox.register("expr", gp.genHalfAndHalf, pset=pset, min_=1, max_=7)
+toolbox.register("expr", gp.genHalfAndHalf, pset=pset, min_=2, max_=DEPTH_LIMIT - 2)
 toolbox.register("individual", tools.initIterate, creator.Individual, toolbox.expr)
 toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 toolbox.register("compile", gp.compile, pset=pset)
@@ -474,7 +486,7 @@ MAX_FITNESS = BOARD_SIZE - len(snake.body)
 def eval(individual):
 	total = 0
 	for i in range(EVAL_RUNS):
-		total += runGameFib(individual)[0]
+		total += runGame(individual)[0]
 	return MAX_FITNESS - (total / EVAL_RUNS),
 
 def fib(n):
@@ -486,8 +498,8 @@ def fib(n):
 def evaluate_score(individual):
 	total = 0
 	for i in range(EVAL_RUNS):
-		total += runGameFib(individual)[0]
-	return (total / EVAL_RUNS),
+		total += runGame(individual)[0]
+	return total,
 
 def evaluate_score_square(individual):
 	total = 0
@@ -495,18 +507,18 @@ def evaluate_score_square(individual):
 		total += runGameFib(individual)[0] ** 2
 	return (total / EVAL_RUNS),
 
-def evaluate_factorial(individual):
+def evaluate_multiply(individual):
 	total = 0
 	for i in range(EVAL_RUNS):
-		total += runGameFib(individual)[0] * (total if total > 0 else 1)
-	return (total / EVAL_RUNS),
+		total = runGameFib(individual)[0] * (total if total > 0 else 1)
+	return total,
 
 
-toolbox.register("evaluate", evaluate_factorial)
+toolbox.register("evaluate", evaluate_score)
 
-toolbox.register("select", tools.selTournament, tournsize=5)
-#toolbox.register("select", tools.selDoubleTournament,
-#	fitness_size=3, parsimony_size=1.2, fitness_first=False)
+#toolbox.register("select", tools.selTournament, tournsize=5)
+toolbox.register("select", tools.selDoubleTournament,
+	fitness_size=9, parsimony_size=1.1, fitness_first=False)
 toolbox.register("mate", gp.cxOnePointLeafBiased, termpb=0.1)
 toolbox.register("expr_mut", gp.genFull, min_=0, max_=2)
 toolbox.register("mutate", gp.mutUniform, expr=toolbox.expr_mut, pset=pset)
@@ -517,7 +529,7 @@ toolbox.register("map", pool.map)
 for type in ["mate", "mutate"]:
 	toolbox.decorate(
 		type,
-		gp.staticLimit(key=operator.attrgetter("height"), max_value=17)
+		gp.staticLimit(key=operator.attrgetter("height"), max_value=DEPTH_LIMIT)
 	)
 
 def main():
@@ -562,6 +574,7 @@ def main():
 	best = tools.selBest(pop, 1)
 	for ind in best:
 		runs = []
+		
 		for run in range(500):
 			#displayStrategyRun(ind)
 			runs.append(runGame(ind)[0])
@@ -570,7 +583,19 @@ def main():
 		print("Mean:  " + str(numpy.mean(runs)))
 		print("St.dv: " + str(numpy.std(runs)))
 
+		nodes, edges, labels = gp.graph(ind)
+		g = nx.Graph()
+		g.add_nodes_from(nodes)
+		g.add_edges_from(edges)
+		pos = nx.graphviz_layout(g, prog="dot")
+
+		nx.draw_networkx_nodes(g, pos)
+		nx.draw_networkx_edges(g, pos)
+		nx.draw_networkx_labels(g, pos, labels)
+		plt.show()
+
 		while True:
+		    #displayRunPythonista(ind)
 			displayStrategyRun(ind)
 
 

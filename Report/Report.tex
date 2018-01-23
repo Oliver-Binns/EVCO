@@ -42,8 +42,6 @@
 \subsection{Background}
 Biomimicry, the imitation of nature for solving human problems has produced many examples of world class design such as Velcro(R), self-cleaning paints and Shinkansen high-speed trains\cite{biomimicry}.  Since the term biomimicry was first coined in 1997 by J. Benyus, this design philosophy has started to inspire many new developments. As well as the aforementioned mimics of physical systems in nature, natural processes have also been imitated, such as in the circular economy in product design and swarm robotics in computer science.
 \\\\
-%TALK ABOUT THE BENEFITS OF BIOMIMICRY
-%Relate this back, why does EVCO benefit from biomimicry.
 Evolutionary Computation (EC) is a machine learning technique which is directly inspired by biological evolution. This is clearly another example of an imitation of nature's processes. Life has been around on earth for over 3.5 billion years, this is a lot of research \& development time to produce useful solutions which can be related to many of the current problems in a wide range of fields. Through evolution, nature has already produced its own solutions to many of the hardest machine learning problems of today such as vision.
 \\\\
 Machine learning usually focuses on optimisation of a particular goal, or set of goals, in a similar way that human engineers aim to produce optimal designs. Benyus sums this up well: `Computers can generate random ideas much faster than most engineers. And computers, not yet able to feel embarassment or peer pressure, are not afraid to try off-the-wall ideas. Ideas are just ideas; the more the merrier.'\cite[pp.209]{biomimicry}
@@ -63,7 +61,7 @@ Implementing this task will involve facing all of the usual challenges in evolut
 %general overview of the problems that will be discussed in the next section
 %challenges that might be faced in this task
 %GENERAL TASKS WITH GENETIC PROGRAMMING
-Starter sensing functions are given that tell the snake if there is a wall, itself or food directly ahead
+The task provides some sensing functions are given that tell the snake if there is a wall, itself or food directly ahead. Additional sensing functions may, and will, be implemented in order to bring out important features of the game state that will require action to be taken. The brief states that no additional movement functions can be implemented, which relates to the fact that the controls of the game are fixed. It should be noted that while the movement functions have not been altered, some of the gameplay code has been refactored to allow the new movement functions to take advantage of existing code.
 
 \section{Methods} %[35 marks..!]
 % Quality of the design of the algorithm (e.g. choice of representation, fitness
@@ -79,55 +77,46 @@ All the described algorithms have been written in Python 2.7.12 and DEAP Version
 %LECTURE: 'Representation of the problem (encoding) can help to better understand the landscape of the problem.'
 %Representation can significantly affect the size of the search space and thus the time needed to search it
 %Compresses the model and thus it requires less storage space, this is good because..?
-The representation links the original problem to the search space over which the algorithm runs. As such, the type of representation chosen can significantly affect the size of the search space and by extension, the time needed to search it.
-
-%Thoughts- obviously don't want to loose too much detail by having a representation that is TOO abstract -this will lead to bad solutions- CITATION NEEDED
+The representation links the original problem to the search space over which the algorithm runs. As such, the type of representation chosen can significantly affect the size of the search space and by extension, the time needed to search it. Having a solution that is too abstract may reduce some required detail from the problem and remove the ability to produce good solutions. %CITATION NEEDED
+The aim will be to encode the problem in a way that the representation requires minimal storage space and can easily search the problem space for good individuals. 
 
 \myparagraph{Genetic Algorithms (GA)}
-GAs are perhaps the most commonly used form of evolutionary algorithm. They are generally used for optimisation problems but have been applied to a variant of the snake game before\cite{snake_paper}. In this case, the GA was used to optimise four parameters (smoothness, space, food and direction) which determined the snake's movement.
+GAs are perhaps the most commonly used form of evolutionary algorithm. They are generally used for optimisation problems but have been applied to a variant of the snake game before\cite{snake_paper}. In this case, the GA was used to optimise four parameters (smoothness, space, food and direction) which determined the snake's movement. Deciding on important parameters and how an individual would react to different values of them seems to be a significant challenge of this type of implementation. It would tie the algorithm more closely to the game and reduce its ability to generalise.
 
 \myparagraph{Evolutionary Strategy (ES)}
-
+%TODO discuss
 
 \myparagraph{Genetic Programming (GP)}
-The aim of GP is to evolve programs that can be used to solve a problem. Clearly this is immediately more relevant for our snake implementation, the aim would be to create a program that can be run to determine our next move given the current state. GP uses a tree representation for programs, where the internal nodes are functions and the leaf nodes of the tree are constants and variables.
-\\
-GP has previously been explored by Ehlis\cite{snake_blog} and produced some promising results. Different function sets have been explored as well as a technique called priming which... [what is this?].
+The aim of GP is to evolve programs that can be used to solve a problem. Clearly this is immediately more relevant for our snake implementation, the aim would be to create a program that can be run to determine our next move given the current state. GP uses a tree representation for programs, where the internal nodes are functions and the leaf nodes of the tree are constants and variables. GP has previously been explored by Ehlis\cite{snake_blog} and produced some promising results. Different function sets have been explored as well as a technique called priming which re-runs the algorithm starting with the best individuals and a new population if no good results are found.
 
 \myparagraph{Neuroevolution}
-Neuroevolution is a hybrid technique between evolutionary computing and artificial neural networks (ANN).
-Unfortunately as the brief requires that the DEAP Python library is used, neuroevolution is not an available option as DEAP does not support it.
-Grammatical Evolution? Is this explicitly supported in DEAP?\cite{deap}
-%DEAP is a requirement, so if this is not support, this is a valid reason to reject it.. however it can be mentioned in further work below!
-DEAP's transparency allows virtually any algorithm to be implemented but it's easier to use the built in structures.
-
-%Does the number of functions (primitives) affect the algorithm's performance?
-%CITATIONS?
-
+Neuroevolution is a hybrid technique between evolutionary computing and artificial neural networks (ANN). The weights and structure of the neural network are initialised and then developed using an evolutionary algorithm. Unfortunately as the brief requires that the DEAP Python library is used, neuroevolution is not an available option as DEAP does not yet support it. While DEAP's open data structures and transparency allow for virtually any algorithm to be implemented, it will be easier far to use the built in structures.
 
 \subsubsection{Choice and Justification}
-Genetic Programming will be used as it most closely fits the aims set out in the introduction above. A previous implementation of GP for snake is available online\cite{snake_blog}, this has been re-written in DEAP and slightly adapted to allow it to work with the available controls (up, down, left, right). Originally, this code was run with a population of 10,000 across 500 generations. Due to time constraints, this amount of computing was not feasible and needed to be considerably cut down. The final results have been generated using a population of X across Y generations. While the highly successful results from this original experiment could not be full reproduced, this new implementation gives a good baseline for judging further improvements. Any changes proposed in this report will be compared against this baseline in order to produce meaningful results. In order to avoid anomalous results caused by randomness, all results given are the mean result over 30 code runs.%TODO determine reasonable tolerance for generations AND population
-Several sensing functions have been given in the problem definition which all return boolean.
+Genetic Programming will be used as it most closely fits the aims set out in the introduction above. It intuitively maps to the problem, and will be the easiest to implement as the brief already contains a starter function set, which may be expanded, and a terminal set. A previous implementation of GP for snake is available online\cite{snake_blog}, this has been re-written in DEAP and slightly adapted to allow it to work with the available controls (up, down, left, right). Originally, this code was run with a population of 10,000 across 500 generations. Due to time constraints, this amount of computing was not feasible and needed to be considerably cut down. The final results have been generated using a population of 1000 across 75 generations, however the data for a full run of the control has been provided for completeness (Fig. \ref{table:population_size}). While the highly successful results from this original experiment could not be full reproduced, this new implementation gives a good baseline for judging further improvements. Any changes proposed in this report will be compared against this baseline in order to produce meaningful results. In order to avoid anomalous results caused by randomness, all results given are the mean result over 30 code runs.%TODO determine reasonable tolerance for generations AND population
 
 \subsubsection{Physical Environments}
 %MOVE THIS SECTION TO EVALUATION? ---------->>>
 %Textbook: An important category of GP applications arises in contexts where executing a given expression changes the environment.
 % ... THIS IS THE CASE IN SNAKE? See textbook Chap 6.10
 This application of GP fits into a specific category involving a physical enviroment, which in this case is simulated. The added difficulty comes from the fact that the execution of any terminal element may change the environment. Once this change has been made, the subsequent execution may produce a different effect in the environment. In this kind of application the internal EA mechanics remains the same, but fitness evalutation can be significantly more computationally expensive\cite[p. 110]{textbook} in order to get a fair representation. In this example, as with the control, the fitness of a particular program will need to be determined over a full game, instead of a single turn. This will be discussed further in Section \ref{fitness_evaluation}.
-\\\\
-% <--------
-%rename section "Function Set", add "Terminal Set section"
-%Which additional sensing functions (if any) have been implemented?
-Previous work has shown that the function set can help to find a better solution, however we need to be careful of overparameterising the problem.%cite for this
-This is a common trade-off in many forms of machine learning?
-%see function set experiment conducted in paper! - take results from this?
-The control code has an expanded function set from the original brief
-\ref{table:function_set}.
+\myparagraph{Terminal Set}
+The terminal set uses the movement functions which, as previously mentioned, may not be altered. These functions change the directions of the snake to up, down, left and right. However, an additional terminal has been added which makes no changes to the current movement of the snake. This terminal should allow the snake to reduce its size by removing the need to check its current direction in order to maintain its current course.
 
+\myparagraph{Function Set}
+%Which additional sensing functions (if any) have been implemented?
+Previous work has shown that the function set can help to find a better solution, however we need to be careful of overparameterising the problem. %cite for this
+This is a common trade-off in many forms of machine learning. In this case, experiments %TODO- RESULTS FOR THIS?
+and program analysis %TODO- show PROGRAM TREE
+showed that by replacing the snake's ability to sense its direction with a terminal that allows it to maintain its current course resulted in a significant score boost as well as a drop in the overall program size.% GRAPHS PLZ
+
+%Does the number of functions (primitives) affect the algorithm's performance?
+%CITATIONS?
+
+\subsection{Population}
 \subsubsection{Initialisation Procedure}
 DEAP offers all of the three main initialisation methods used in genetic programming. The Full method initialises a program tree where every individual in the population is the same depth along every path. The grow method creates trees with nodes that terminate before the maximum height is reached. The final type of initialisation procedure, ramped half and half, creates half of the trees using the full method and half using the grow method. This is what will be used for this algorithm as it will provides the greatest diversity in initial population.
 
-\subsection{Population}
 \subsubsection{Size}
 \label{population_size}
 Having the correct population size is crucial to success\cite{dynamic_population_size}. The size of the population needs to be large enough to explore a significant amount of the search space by containing a number of promising individuals. If this is not the case, a large amount of mutation will be required to find any good solutions creating a very unstable solution. Too large a population will significantly impact the algorithm's performance. As the population size tends towards the size of the search space, the algorithm becomes no better than a brute force solution, running unnecessarily slowly. It has also been mathematically proved that, for certain problems, a larger population is highly likely lead to a sub-optimal solution if the problem has an attraction basin near some local optimum\cite{unhelpful_large_populations}.
@@ -144,8 +133,7 @@ It is worth noting that the control has a mutation value of 0, so it requires th
 The optimal size for the population is the size where a good solution is often produced but the program is quick to converge\cite{optimal_population_size}. A population of 1,000 seems to give a solution that is reasonably quick to converge (approx. 50 generations, Fig. \ref{fig:pop_convergence}) but also produces a reasonable score across multiple games (around 6.97, \ref{table:population_size}). This size of population will mean that proposed changes to the algorithm in this paper can be tested in a reasonable amount of time even with the limited timespan for the project and available computing resources.
 
 \subsubsection{Diversity}
-Within this evolutionary computation task, each individual of the population corresponds to a point in the search space of all possible programs. %a section of the search space that is showing promising results
-Diversity corresponds to having these points reasonably spread out throughout this space. A diverse population is, by definition, exploring more of this search space than one that is not. %CONSIDER PHRASING
+Within this evolutionary computation task, each individual of the population corresponds to a point in the search space of all possible programs. Diversity corresponds to having these points reasonably spread out throughout this space. A diverse population is, by definition, covering more of this search space than one that is not. Ensuring a diverse population is important to allow the algorithm to explore several promising ... at once\cite{diversity_recommended}. Having a large enough population can contribute to having a good initial diversity, but diversity needs to also be maintained throughout the run of the algorithm to prevent premature convergence.
 %Can this be related back to k-nearest vs least-squares? Other machine learning problems
 
 \subsection{Evaluation}
@@ -156,7 +144,16 @@ Diversity corresponds to having these points reasonably spread out throughout th
 Implementing a good fitness evaluation function is essential to evolving a solution to this problem. Without this, there will be no way to assess individuals in order to determine which will survive and reproduce. There are two major objectives at play in the game, avoiding crashing the snake and getting to the food before the timer hits zero. These can be represented by the final size of the snake when the game ends, as if the snake crashes then the game ends and it is unable to get to the food and grow. Therefore, we can simply consider this a single-objective problem where the objective is produce the maximum length of snake before either the snake crashes or the timer hits zero. This significantly simplifies the problem with minimal impact.
 \\\\
 The snake's food spawns randomly around the board. This element of stochasticity makes evaluating the fitness of a particular solution more difficult. The fitness of a given algorithm will likely change between games and this has already shown by previous results, as mentioned in Section \ref{population_size}. In order to ensure a fairer representation of fitness, each solution may need to be evaluated across multiple games.
-%DETAIL.. how many games, how can we make this fair?
+
+\myparagraph{Incentives}
+Certain scenarios in the game can lead to difficulties in evolving an individual that gets past a certain score. Rewarding individuals for making progress towards this, even if the score is not actually increased, can help to selectively breed programs that get past these boundaries. Likewise, punishing individuals that make obvious mistakes can also help to ensure they do not pass on these traits.
+\\\\
+A number of incentives and penalties have been employed to ensure maximum fitness:
+\begin{itemize}
+	\item Evaluating the fitness with multiple games, as described above will incentivise the snake to perform well generally rather than in only one particular fluke case.
+	\item Adding a significant penalty to the score for crashing into a wall will ensure individuals never take this choice.
+\end{itemize}
+%TODO DETAIL.. how many games, how can we make this fair?
 %Is each point worth the same?
 	%do we want to incentivise consistently good scores or flukes?
 A number of different fitness functions were tested.
@@ -166,8 +163,8 @@ Each of these have different benefits
 
 \subsection{Parent Selection}
 %How do we pick which individuals continue?
-Selecting which individuals should have influence over the next generation is one of the most important factors for success in Evolutionary Computing. If only the best individuals are selected then diversity will be lost, the algorithm will get stuck in a local minima and be unable to find a good general solution. This is known as premature convergence. If too many of the less-promising solutions are selected then the algorithm may be unstable meaning good solutions will take too long to find and may be lost quickly. Striking a good balance between a diverse population and a stable algorithm is necessary for success in this task.
-
+Selecting which individuals should have influence over the next generation is one of the most important factors for success in Evolutionary Computing. If only the best individuals are selected then diversity will be lost, the algorithm will get stuck in a local minima and be unable to find a good general solution. This is known as premature convergence. If too many of the less-promising solutions are selected then the algorithm may be unstable meaning good solutions will take too long to find and may be lost quickly. Striking a good balance between a diverse population and a stable algorithm is necessary for finding a good solution in a reasonable time while preventing premature convergence.
+\\\\
 In biological evolution, old generations die to free up resources for newer generations.
 Disregarding solutions due to age ... %good or bad? diversity, other measures?
 
@@ -193,10 +190,11 @@ Diversity is difficult to quantity in an objective manner and, as such, no singl
 %pros, cons
 
 \subsubsection{Bloat}% How we work to prevent this,
-Bloat, the increase of the size of a genetic program without significant increase in fitness, is a difficult problem to overcome. Bloat is linked to, but different from, overfitting, a common problem in many forms of machine learning\cite{overfitting_bloat}. %talk about this more?
-
-Controlling bloat while maximising fitness turns the evolution into a multi-objective optimisation problem. The two most commonly used solutions to bloat are parsimony pressure and double tournaments. Parsimony pressure subtracts a value based on the size of the program tree from the individual's fitness, this value does not necessarily need to be linear. %CONSIDER phrasing here
-%The real aim here is to produce programs with a smaller tree size but similar fitness\cite{parsimony_pressure}
+Bloat, the increase of the size of a genetic program without significant increase in fitness, is a difficult problem to overcome. Bloat is linked to, but different from, overfitting, a common problem in many forms of machine learning\cite{measuring_bloat}. The real aim here is to find the smallest possible program tree for a particular fitness.
+\\\\
+All forms of bloat control have been shown to work best when augmented with a form of tree depth limiting\cite{parsimony_pressure, bloat_comparison}. In this case, the program trees have been limited to a height of 8, a value decided using experimentation. Controlling bloat while maximising fitness turns the evolution into a multi-objective optimisation problem. The two most commonly used solutions to bloat are parsimony pressure and double tournaments. Parsimony pressure subtracts a value based on the size of the program tree from the individual's fitness. Traditional parsimony presure is parametric and therefore a model that specifies an exact trade-off between values of model and size is needed. This is difficult to produce as this value may not be known before runtime and may not be the same between different individuals\cite{parsimony_pressure}. 
+%\cite{parsimony_pressure}
+\\\\
 Double tournaments can be used for parent selection as an extension of regular tournament selection described in Section \ref{tournament}.
 It has been shown that the order of a double tournament has no significant bearing on the end result. [cite, practical?]%Several recent papers discuss this issue and propose methods for tackling it, parsimony pressure above and.. \cite{multi_objective_bloat}
 
@@ -212,14 +210,16 @@ A trade-off is required here, too much mutation will result in a highly unstable
 Care needs to be taken when implementing mutation so as not to create biases. This is particularly the case with real-valued mutation.. %which is not being used in this project?
 %How to prevent biases?
 
-\subsubsection{Recombination}
+\subsubsection{Crossover}
 %Crossover-
 %IF GA, is this fixed point crossover??
 
 %multipoint crossover, uniform crossover, no crossover?
 %cxOnePoint, cxTwoPoint, cxUniform, cxPartiallyMatched
 
-\subsubsection{Termination Condition}
+\subsubsection{Calibration}
+Extensive experimentation (Fig. \ref{fig:calibration}) has shown that for this population size (1000), reasonably high values for both mutation and crossover tend to produce individuals that work best in the game. Particlularly good values appear to be produced when each value is 0.75, so this will be used.
+
 %Certain number of generations? - consistent across runs
 %Certain fitness level? - guarantees a good solution, cannot be guaranteed to terminate
 Certain number of generations..
@@ -232,15 +232,29 @@ Certain number of generations..
 %large numbers of runs can produce results that are significant but not important
 
 %In order to evaluate we need to compare it with a control
+While the control algorithm was originally intended to have a population of 10,000 and run for 500 generations, in order to make comparisons fair...
+In order to make these comparisons fair, both algorithms have been run with a population of 1000 across 75 generations.
 %designing controls can be difficult, they may be subject to: placebo effect & observer effect
-
+\myparagraph{Scoring}
 %USE A NULL HYPOTHESIS!!
 %Non-parametric tests DO NOT require a distribution to be normal and should be the default choice, rank sum test??
+A Wilcoxon rank sum test has been used to compare the scoring distribution for the new implementation, $S_N$, with the original control, $S_C$. This test is used as there is insufficient evidence to prove whether or not either of the distributions $S_N$ or $S_C$ are normal.
+\\\\
+The null hypothesis, $H_0$, states that the new algorithm produces results that are comparable to the control.
+\[H_0: S_N = S_C\]
+Therefore, the alternative hypothesis is-
+\[H_1: S_N > S_C\]
 
+We assume that $H_0$ is true. If the probability that $H_0$ is true, $p(H_0) < 0.05$, then there is sufficient evidence to reject the null hypothesis.
+
+\myparagraph{Runtime}
+Significant savings were also made on the runtime by developing an algorithm that produced good results even with a small population and limited number of generations. These is sufficient evidence to prove that runtime has been significantly sped up using runtime distributions, $T_N$ and $T_C$ for the new implementation and control, respectively.
+\[H_0: T_N = T_C\]
+\[H_1: T_N > T_C\]
 %SEE Discovering Statistics using R
 %SEE paper: Lecture 4 reading, A Practical Guide for Using Statistical Tests to Assess Randomized Algorithms in Software Testing
 
-%COMPARE to existing Blog and Paper snake solutions?
+%NB. Test performance on different size/shaped game boards?
 
 \section{Conclusion} %[10 marks]
 % Well written and clear
@@ -249,10 +263,9 @@ Certain number of generations..
 % Connects well with the literature and provides relevant references
 % Demonstrates critical ability
 % Provides good suggestions for future work
-Significant
 
-The null hypothesis, H0, states that the new algorithm is no significant improvement to the original implementation.
-We assume that H0 is true.
+
+%COMPARE to existing Blog and Paper snake solutions?
 
 %Has DEAP proved a good tool for this task?
 %pros/cons?
@@ -260,7 +273,7 @@ We assume that H0 is true.
 \subsection{Further Work}
 The complexity and diversity of the snake game can lead into plenty of areas for further exploration. Recent developments in evolutionary computation such as co-evolution and neuroevolution could be explored in the context of this task. With co-evolution individuals would have to compete in order to get to the food items first, creating snake players that find the food faster.
 \\\\
-A snake that cycles through each square will always each piece of food as it traverses. An alternative implementation of this algorithm could have a function set with no information of the position of the food, but reward the snake using a fitness function based on the number of unique squares visited before returning to the start position. This alternative algorithm could be compared to the one described in this report to determine which approach is best.
+Alternative approaches to this problem are a promising avenue for future exploration. For example, a snake that cycles through every square on the board will always each piece of food as it traverses. An alternative implementation of this algorithm could have a function set with no information of the position of the food, but reward the snake using a fitness function based on the number of unique squares visited before returning to the start position. This alternative algorithm could be compared to the one described in this report to determine which approach is best.
 \\\\
 Future work could also explore the adaptability of this program to perform well across the wide number of variants of the game that exist with different formats and rules. This could be further expanded to attempt to create individuals that generalise across multiple game variants and carry their learning across in the way a human player would.
 
@@ -320,36 +333,8 @@ Future work could also explore the adaptability of this program to perform well 
 \hline
 \end{tabular}
 \end{center}
-\caption{Population Size Performance}
+\caption{Population Size Performance over 250 Generations}
 \label{table:population_size}
-\end{table}
-
-
-\begin{table}[h]
-\begin{center}
-\begin{tabular}{|l|l|l|r|}
-\hline%Add time taken?
-\textbf{Evaluation} & \textbf{Description} & \multicolumn{2}{c|}{\textbf{Test Run Score}} \\
-\hline
-\multirow{3}{*}{Score} & \multirow{4}{*}{description here}
-& Mean & X \\
-&& Max  & Y \\
-&& St.Dev & Z \\
-\hline
-\multirow{3}{*}{Score Squared} & \multirow{4}{*}{description here}
-& Mean & X \\
-&& Max  & Y \\
-&& St.Dev & Z \\
-\hline
-\multirow{3}{*}{Score Factorial} & \multirow{4}{*}{description here}
-& Mean & X \\
-&& Max  & Y \\
-&& St.Dev & Z \\
-\hline
-\end{tabular}
-\end{center}
-\caption{Fitness Evaluation Performance}
-\label{table:function_set}
 \end{table}
 
 \begin{figure}[ht]
@@ -388,6 +373,14 @@ Future work could also explore the adaptability of this program to perform well 
 \label{fig:varying_population_size}
 \end{figure}
 
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=1\textwidth]{Figures/heatmap}
+
+\caption{Varying Mutation and Crossover}
+\label{fig:calibration}
+\end{figure}
 
 
 \begin{figure}[ht]

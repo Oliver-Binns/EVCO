@@ -20,8 +20,8 @@ from deap import tools
 from functools import partial
 
 EVAL_RUNS = 1
-POP_SIZE = 750
-TOTAL_GENS = 250
+POP_SIZE = 1000
+TOTAL_GENS = 75
 MUT_PB = 0
 CRX_PB = 0.8
 
@@ -445,7 +445,6 @@ for type in ["mate", "mutate"]:
 	)
 
 def main():
-	global time_log
 	global snake
 	global pset
 
@@ -454,74 +453,44 @@ def main():
 	mean_fit = []
 	max_fit = []
 
-	for i in range(30):
-		time_log = open("Statistics/Labs/"+ str(POP_SIZE) +"/Timing.txt", "a+")
-		time_log.write("Run " + str(i) + "\n")
-		start = timer()
-		time_log.write("Start: " + str(start) + "\n")
+	pop = toolbox.population(n=POP_SIZE)
+	hof = tools.HallOfFame(1)
 
-		pop = toolbox.population(n=POP_SIZE)
-		hof = tools.HallOfFame(1)
+	stats_fit = tools.Statistics(lambda ind: ind.fitness.values)
+	stats_size = tools.Statistics(len)
+	mstats = tools.MultiStatistics(fitness=stats_fit, size=stats_size)
+	mstats.register("avg", lambda val: round(numpy.mean(val), 2))
+	mstats.register("std", lambda val: round(numpy.std(val), 2))
+	mstats.register("min", numpy.min)
+	mstats.register("max", numpy.max)
 
-		stats_fit = tools.Statistics(lambda ind: ind.fitness.values)
-		stats_size = tools.Statistics(len)
-		mstats = tools.MultiStatistics(fitness=stats_fit, size=stats_size)
-		mstats.register("avg", lambda val: round(numpy.mean(val), 2))
-		mstats.register("std", lambda val: round(numpy.std(val), 2))
-		mstats.register("min", numpy.min)
-		mstats.register("max", numpy.max)
+	try:
+		pop, log = algorithms.eaSimple(
+			pop,
+			toolbox,
+			CRX_PB,  # CHANCE OF CROSSOVER
+			MUT_PB,  # CHANCE OF MUTATION
+			TOTAL_GENS,  # NO Generations
+			halloffame=hof,
+			verbose=True,
+			stats=mstats
+		)
+	except KeyboardInterrupt:
+		pool.terminate()
+		pool.join()
+		raise KeyboardInterrupt
 
-		try:
-			pop, log = algorithms.eaSimple(
-				pop,
-				toolbox,
-				CRX_PB,  # CHANCE OF CROSSOVER
-				MUT_PB,  # CHANCE OF MUTATION
-				TOTAL_GENS,  # NO Generations
-				halloffame=hof,
-				verbose=True,
-				stats=mstats
-			)
-		except KeyboardInterrupt:
-			pool.terminate()
-			pool.join()
-			raise KeyboardInterrupt
+	# Total score as..
+	# Attempt parsimony length prevention first
+	best = tools.selBest(pop, 1)
+	for ind in best:
+		runs = []
+	
+		for run in range(500):
+			runs.append(runGame(ind)[0])
 
-		end = timer()
-		time_log.write("End: " + str(end) + "\n")
-		time_log.write("Elapsed: " +  str(end - start) + "\n")
-
-		lb_file = open("Statistics/Labs/"+ str(POP_SIZE) +"/Run "+str(i)+".txt", "wb")
-		pickle.dump(log, lb_file)
-		lb_file.close()
-
-		y1, y2 = log.chapters["fitness"].select("avg", "min")
-		mean_fit.append(y1)
-		max_fit.append(y2)
-
-		# Total score as..
-		# Attempt parsimony length prevention first
-		best = tools.selBest(pop, 1)
-		for ind in best:
-			scores = []
-			for i in range(500):
-				scores.append(runGame(ind)[0])
-			print()
-			print(scores)
-			time_log.write("Scores: " + str(scores) + "\n\n")
-		time_log.close()
-	#x = range(TOTAL_GENS + 1)
-	#y1np = numpy.array(mean_fit)
-	#y1 = y1np.mean(axis=0)
-	#y2 = max(max_fit)
-
-	#plt.plot(x, y1, label="Mean Fitness")
-	#plt.plot(x, y2, label="Most Fit")
-	#plt.title("Fitness Progress through Generations")
-	#plt.xlabel("Generation")
-	#plt.ylabel("Fitness")
-	#plt.legend(loc='lower left')
-	#plt.savefig("fitness_benchmark.png")
-	#plt.show()
+		print("Max:   " + str(max(runs)))
+		print("Mean:  " + str(numpy.mean(runs)))
+		print("St.dv: " + str(numpy.std(runs)))
 
 main()
