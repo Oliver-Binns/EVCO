@@ -40,28 +40,26 @@
 % Highlights the approach that will be used and justifies it
 
 \subsection{Background}
-Biomimicry, the imitation of nature for solving human problems has produced many examples of world class design such as Velcro(R), self-cleaning paints and Shinkansen high-speed trains\cite{biomimicry}.  Since the term biomimicry was first coined in 1997, this design philosophy has started to inspire many new developments. As well as the aforementioned mimics of physical systems in nature, natural processes have also been imitated, such as in the circular economy in product design and swarm robotics in computer science.
+Biomimicry, the imitation of nature for solving human problems has produced many examples of world class design such as Velcro(R), self-cleaning paints and Shinkansen high-speed trains\cite{biomimicry}.  Since the term biomimicry was first coined in 1997 by J. Benyus, this design philosophy has started to inspire many new developments. As well as the aforementioned mimics of physical systems in nature, natural processes have also been imitated, such as in the circular economy in product design and swarm robotics in computer science.
 \\\\
 %TALK ABOUT THE BENEFITS OF BIOMIMICRY
 %Relate this back, why does EVCO benefit from biomimicry.
-Evolutionary Computation (EC) is a machine learning technique which is directly inspired by biological evolution. This is clearly another example of an imitation of nature's processes.
-Life has been around on earth for over 3.5 billion years, this is a lot of research \& development time to produce useful solutions which can be related to many of the current problems in a wide range of fields. Through evolution, nature has already produced solutions to many of the hardest machine learning problems of today.
+Evolutionary Computation (EC) is a machine learning technique which is directly inspired by biological evolution. This is clearly another example of an imitation of nature's processes. Life has been around on earth for over 3.5 billion years, this is a lot of research \& development time to produce useful solutions which can be related to many of the current problems in a wide range of fields. Through evolution, nature has already produced its own solutions to many of the hardest machine learning problems of today such as vision.
 \\\\
-Machine learning usually focuses on optimisation of a particular goal...? link this into the following-->
-%Excerpt from Biomimicry: This "hill climbing" in a landscape of possibilities towards an optimal design is what engineers do, but computers can generate random ideas much faster than most engineers. And computers, not yet able to feel embarassment or peer pressure, are not afraid to try off-the-wall ideas. Ideas are just ideas; the more the merrier. page 209
+Machine learning usually focuses on optimisation of a particular goal, or set of goals, in a similar way that human engineers aim to produce optimal designs. Benyus sums this up well: `Computers can generate random ideas much faster than most engineers. And computers, not yet able to feel embarassment or peer pressure, are not afraid to try off-the-wall ideas. Ideas are just ideas; the more the merrier.'\cite[pp.209]{biomimicry}
 
 \subsection{DEAP}
 \textbf{D}istributed \textbf{E}volutionary \textbf{A}lgorithms in \textbf{P}ython (DEAP) is an open source framework for Python\cite{deap}. The framework aims to provide tools for quickly producing custom evolutionary algorithms. It provides a large amount of in-built functionality for implementing commonly used evolutionary algorithms and allows for parts of these to be mixed and matched as well as intermixed with custom sections. %WHICH VERSION OF DEAP WAS USED?
 
 \subsection{EC for Snake}
-The task given is to create an evolutionary algorithm in Python using the DEAP framework in order to play the classic video game, Snake. This is not a new task and has been the subject of previous work including an ...\cite{snake_blog} and more recently a ...\cite{snake_paper}. Despite this there is still room for further work, due to ongoing research into evolutionary computing and significant challenges because of the nature of the game.
+The task given is to create an evolutionary algorithm in Python using the DEAP framework in order to play the classic video game, Snake. This is not a new task and has been the subject of previous work including implementations using genetic programming\cite{snake_blog} and more recently genetic algorithms\cite{snake_paper}. Despite this there is still room for further work, due to ongoing research into evolutionary computing and significant challenges because of the nature of the game.
 \\\\
 There are a variety of available instances of Snake with an array of different rules. In this case, there is a square game board of 14x14 cells as shown in Figure. \ref{fig:game_board}. The snake will continously move forwards in the direction it is facing, which can be changed by the user at any time. The aim is to collect food that appears in a random cell on the board when the previous one is eaten. Each time the snake eats a piece of food, it grows and takes up an extra cell. Once the snake fills every cell it can no longer grow. Hence, the highest possible score (185) is equal to the number of cells (196) less the initial length of the snake (11).
 \\\\
 %difficulties around the game that might cause issues
 %PROBLEMS WITH THE TASK (SNAKE) in particular
 Implementing this task will involve facing all of the usual challenges in evolutionary computation such as maintaining diversity and reducing bloat. Snake also brings along new challenges. The random placement of the food on the board adds an element of stochasticity to the solution meaning algorithm will perform differently across multiple runs and care will need to be taken to ensure that it works in the general case. The solution will also need to balance the need for the snake to avoid crashing into walls or itself while still picking up the food before time runs out. Optimising both of these objectives at the same time might be difficult.
-
+\\\\
 %general overview of the problems that will be discussed in the next section
 %challenges that might be faced in this task
 %GENERAL TASKS WITH GENETIC PROGRAMMING
@@ -127,8 +125,7 @@ The control code has an expanded function set from the original brief
 \ref{table:function_set}.
 
 \subsubsection{Initialisation Procedure}
-Ramped Half and Half will be used as it provides the greatest diversity in initial population
-%Full/Grow/Ramped Half and Half?
+DEAP offers all of the three main initialisation methods used in genetic programming. The Full method initialises a program tree where every individual in the population is the same depth along every path. The grow method creates trees with nodes that terminate before the maximum height is reached. The final type of initialisation procedure, ramped half and half, creates half of the trees using the full method and half using the grow method. This is what will be used for this algorithm as it will provides the greatest diversity in initial population.
 
 \subsection{Population}
 \subsubsection{Size}
@@ -195,22 +192,13 @@ Diversity is difficult to quantity in an objective manner and, as such, no singl
 %description
 %pros, cons
 
-
 \subsubsection{Bloat}% How we work to prevent this,
 Bloat, the increase of the size of a genetic program without significant increase in fitness, is a difficult problem to overcome. Bloat is linked to, but different from, overfitting, a common problem in many forms of machine learning\cite{overfitting_bloat}. %talk about this more?
 
-Controlling bloat while maximising fitness turns the evolution into a multi-objective optimisation problem. The two most commonly used solutions to bloat are parsimony pressure and double tournaments.
-
-Parsimony pressure subtracts a value based on the size of the program tree from the individual's fitness, this value does not necessarily need to be linear. %CONSIDER phrasing here
-%The real aim here is to produce programs with a smaller tree size but similar fitness
-
-\cite{parsimony_pressure}
-
+Controlling bloat while maximising fitness turns the evolution into a multi-objective optimisation problem. The two most commonly used solutions to bloat are parsimony pressure and double tournaments. Parsimony pressure subtracts a value based on the size of the program tree from the individual's fitness, this value does not necessarily need to be linear. %CONSIDER phrasing here
+%The real aim here is to produce programs with a smaller tree size but similar fitness\cite{parsimony_pressure}
 Double tournaments can be used for parent selection as an extension of regular tournament selection described in Section \ref{tournament}.
-It has been shown that the order of a double tournament has no significant bearing on the end result. [cite, practical?]
-
-%Several recent papers discuss this issue and propose methods for tackling it, parsimony pressure above and..
-\cite{multi_objective_bloat}
+It has been shown that the order of a double tournament has no significant bearing on the end result. [cite, practical?]%Several recent papers discuss this issue and propose methods for tackling it, parsimony pressure above and.. \cite{multi_objective_bloat}
 
 % Ongoing work into this may be interesting to talk about!
 
@@ -303,9 +291,9 @@ Future work could also explore the adaptability of this program to perform well 
 & St.Dev & 18.55 & St.Dev & 3.99 \\
 \hline
 \multirow{3}{*}{750}
-& Mean & X & Mean & 5.81 \\
-& Max & Y & Max & 21.97 \\
-& St.Dev & Z & St.Dev & 3.99 \\
+& Mean & 66.5 & Mean & 7.31 \\
+& Max & 252.96 & Max & 23.9 \\
+& St.Dev & 38.66 & St.Dev & 4.46 \\
 \hline
 \multirow{3}{*}{1000}
 & Mean & 78.59 & Mean & 6.97 \\
@@ -331,35 +319,6 @@ Future work could also explore the adaptability of this program to perform well 
 \end{center}
 \caption{Population Size Performance}
 \label{table:population_size}
-\end{table}
-
-
-
-\begin{table}[h]
-\begin{center}
-\begin{tabular}{|l|l|l|l|r|}
-\hline%Add time taken?
-\textbf{Initialisation Procedure} & \multicolumn{2}{c|}{\textbf{Mean Initial Fitness}} & \multicolumn{2}{c|}{\textbf{Test Run Score}} \\
-\hline
-\multirow{3}{*}{Grow}
-& Mean & 6.59 & Mean & 2.76 \\
-& Max & 13.5 & Max & 11.60 \\
-& St.Dev & 2.52 & St.Dev & 2.14 \\
-\hline
-\multirow{3}{*}{Half and Half}
-& Mean & 17.7 & Mean & 4.67 \\
-& Max & 28.9 & Max & 18.8 \\
-& St.Dev & 4.22 & St.Dev & 3.48 \\
-\hline
-\multirow{3}{*}{Full}
-& Mean & 17.7 & Mean & 4.67 \\
-& Max & 28.9 & Max & 18.8 \\
-& St.Dev & 4.22 & St.Dev & 3.48 \\
-\hline
-\end{tabular}
-\end{center}
-\caption{Varying Initialisation Procedure}
-\label{table:initialisation}
 \end{table}
 
 
