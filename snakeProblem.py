@@ -18,10 +18,10 @@ from deap import gp
 from deap import tools
 from functools import partial
 
-EVAL_RUNS = 3
+EVAL_RUNS = 5
 POP_SIZE = 1000
 TOTAL_GENS = 75
-MUT_PB = 0.0
+MUT_PB = 0.2
 CRX_PB = 0.8
 
 
@@ -182,6 +182,7 @@ class SnakePlayer(list):
 					return True
 		return False
 
+
 	def sense_danger_two_ahead(self):
 		self.getAheadLocation()
 		two_ahead = self.getAheadOf(self.ahead)
@@ -275,7 +276,7 @@ def displayStrategyRun(individual):
 	timer = 0
 	collided = False
 	while not collided and not timer == ((2*XSIZE) * YSIZE):
-		time.sleep(0.3)
+		time.sleep(0.15)
 		# Set up the display
 		win.border(0)
 		win.addstr(0, 2, 'Score : ' + str(snake.score) + ' ')
@@ -304,7 +305,7 @@ def displayStrategyRun(individual):
 	print("Score:", snake.score)
 	print("Collided: ", collided)
 	print("Hit Bounds:", hitBounds)
-	input("Press to continue...")
+	raw_input("Press to continue...")
 
 	return snake.score,
 
@@ -358,7 +359,7 @@ def displayRunPythonista(individual):
 	print("Score:", snake.score)
 	print("Collided: ", collided)
 	print("Hit Bounds:", hitBounds)
-	input("Press to continue...")
+	raw_input("Press to continue...")
 
 	return snake.score,
 
@@ -392,6 +393,36 @@ def runGame(individual):
 
 	return snake.score,
 
+# This outline function provides partial code for running the game with an evolved agent
+# There is no graphical output, and it runs rapidly, making it ideal for
+# you need to modify it for running your agents through the game for evaluation
+# which will depend on what type of EA you have used, etc.
+# Feel free to make any necessary modifications to this section.
+def runGameFib(individual):
+	global snake
+	global pset
+
+	routine = gp.compile(individual, pset)
+
+	snake._reset()
+	food = placeFood(snake)
+	timer = 0
+
+	while not snake.snakeHasCollided() and not timer == XSIZE * YSIZE:
+		## EXECUTE THE SNAKE'S BEHAVIOUR HERE ##
+		routine()
+		snake.updatePosition()
+
+		if snake.body[0] in food:
+			snake.score = 1 if snake.score == 0 else snake.score + (snake.score + 1)
+			food = placeFood(snake)
+			timer = 0
+		else:
+			snake.body.pop()
+			timer += 1 # timesteps since last eaten
+
+	return snake.score,
+
 #BASIC EA SET UP
 creator.create("Fitness", base.Fitness, weights=(1.0,))
 creator.create("Individual", gp.PrimitiveTree, fitness=creator.Fitness)
@@ -417,7 +448,6 @@ pset.addPrimitive(snake.if_food_ahead, 2)
 pset.addPrimitive(snake.if_tail_before_food, 2)
 pset.addPrimitive(snake.if_danger_two_ahead, 2)
 
-
 pset.addPrimitive(snake.if_food_up, 2)
 pset.addPrimitive(snake.if_food_down, 2)
 pset.addPrimitive(snake.if_food_left, 2)
@@ -434,7 +464,7 @@ pset.addTerminal(snake.changeDirectionLeft)
 pset.addTerminal(snake.changeDirectionRight)
 
 toolbox = base.Toolbox()
-toolbox.register("expr", gp.genHalfAndHalf, pset=pset, min_=4, max_=8)
+toolbox.register("expr", gp.genHalfAndHalf, pset=pset, min_=1, max_=7)
 toolbox.register("individual", tools.initIterate, creator.Individual, toolbox.expr)
 toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 toolbox.register("compile", gp.compile, pset=pset)
@@ -444,7 +474,7 @@ MAX_FITNESS = BOARD_SIZE - len(snake.body)
 def eval(individual):
 	total = 0
 	for i in range(EVAL_RUNS):
-		total += runGame(individual)[0]
+		total += runGameFib(individual)[0]
 	return MAX_FITNESS - (total / EVAL_RUNS),
 
 def fib(n):
@@ -456,25 +486,25 @@ def fib(n):
 def evaluate_score(individual):
 	total = 0
 	for i in range(EVAL_RUNS):
-		total += runGame(individual)[0]
+		total += runGameFib(individual)[0]
 	return (total / EVAL_RUNS),
 
 def evaluate_score_square(individual):
 	total = 0
 	for i in range(EVAL_RUNS):
-		total += runGame(individual)[0] ** 2
+		total += runGameFib(individual)[0] ** 2
 	return (total / EVAL_RUNS),
 
 def evaluate_factorial(individual):
 	total = 0
 	for i in range(EVAL_RUNS):
-		total += runGame(individual)[0] * (total if total > 0 else 1)
+		total += runGameFib(individual)[0] * (total if total > 0 else 1)
 	return (total / EVAL_RUNS),
 
 
 toolbox.register("evaluate", evaluate_factorial)
 
-toolbox.register("select", tools.selTournament, tournsize=3)
+toolbox.register("select", tools.selTournament, tournsize=5)
 #toolbox.register("select", tools.selDoubleTournament,
 #	fitness_size=3, parsimony_size=1.2, fitness_first=False)
 toolbox.register("mate", gp.cxOnePointLeafBiased, termpb=0.1)
@@ -531,28 +561,17 @@ def main():
 	# Attempt parsimony length prevention first
 	best = tools.selBest(pop, 1)
 	for ind in best:
-		#runs = []
+		runs = []
 		for run in range(500):
+			#displayStrategyRun(ind)
+			runs.append(runGame(ind)[0])
+
+		print("Max:   " + str(max(runs)))
+		print("Mean:  " + str(numpy.mean(runs)))
+		print("St.dv: " + str(numpy.std(runs)))
+
+		while True:
 			displayStrategyRun(ind)
-			#runs.append(runGame(ind)[0])
-
-		#time_log = open("Statistics/Population/Fitness.txt", "a+")
-		#time_log.write("Population Size: " + str(POP_SIZE) + "\n")
-		#time_log.write("Run " + str(i) + "\n")
-		#time_log.write("Elapsed: " + str(end - start))
-		#time_log.write(str(runs) + "\n")
-		#time_log.write(str(max(runs)) + "\n")
-		#time_log.write(str(numpy.mean(runs)) + "\n")
-		#time_log.write(str(numpy.std(runs)) + "\n\n")
-		#time_log.close()
-		#print(runs)
-		#print(max(runs))
-		#print("Elapsed: " + str(end - start))
-		#print(numpy.mean(runs))
-		#print(numpy.std(runs))
-		#print
-		#print(runGame(ind))
-
 
 
 main()
