@@ -1,14 +1,19 @@
-\documentclass{article}
+\documentclass[12pt]{article}
 \usepackage{graphicx}
 \usepackage[nottoc,numbib]{tocbibind}
-\usepackage[a4paper, total={6in, 8in}]{geometry}
+\usepackage[a4paper, total={6.4in, 8.8in}]{geometry}
 \usepackage{multirow}
 \usepackage{subcaption}
 \newcommand{\myparagraph}[1]{\paragraph{#1}\mbox{}\\}
 
+\usepackage{fontspec}
+\setmainfont{Arial}
+
+\usepackage{titling}
 \usepackage{xcolor}
+\usepackage{makecell}
 \newcommand{\highlight}[1]{\colorbox{yellow!50}{$\displaystyle#1$}}
-\hyphenpenalty=700
+%\hyphenpenalty=700
 
 \title{Evolutionary Computation}
 \author{Y1481702}
@@ -19,16 +24,20 @@
 %FONT MUST BE SIZE 12 ARIAL.
 %Margin must be MIN 2cm
 
-\begin{titlepage}
-\maketitle
+\begin{titlingpage}
+\clearpage\maketitle
+\thispagestyle{empty}
 \tableofcontents
-\end{titlepage}
+\newpage
+\vspace*{\fill}
+\begin{abstract}
+This paper develops a new evolutionary algorithm to create a controller for the classic computer game, Snake, using the DEAP Python framework. Implementation trade-offs and decisions are explained and justified using a mixture of experimental data and existing literature. The new implementation critiques and builds on existing work in both evolutionary computation and Snake AI players.
+\end{abstract}
+\vspace*{\fill}
+\end{titlingpage}
 
 % Submit Code, 5 marks
 % Must be a 'good final solution' and run on a test set
-
-%\section{Abstract} %Unmarked - is it necessary? YES this is supposed to mirror a research paper
-\section{Abstract}
 
 % 15 marks
 \section{Introduction}
@@ -83,7 +92,7 @@ The aim will be to encode the problem in a way that the representation requires 
 \myparagraph{Genetic Algorithms (GA)}
 GAs are perhaps the most commonly used form of evolutionary algorithm. They are generally used for optimisation problems but have been applied to a variant of the snake game before\cite{snake_paper}. In this case, the GA was used to optimise four parameters (smoothness, space, food and direction) which determined the snake's movement. Deciding on important parameters and how an individual would react to different values of them seems to be a significant challenge of this type of implementation. It would tie the algorithm more closely to the game and reduce its ability to generalise.
 
-\myparagraph{Evolutionary Strategy (ES)}
+%\myparagraph{Evolutionary Strategy (ES)}
 %TODO discuss
 
 \myparagraph{Genetic Programming (GP)}
@@ -93,7 +102,10 @@ The aim of GP is to evolve programs that can be used to solve a problem. Clearly
 Neuroevolution is a hybrid technique between evolutionary computing and artificial neural networks (ANN). The weights and structure of the neural network are initialised and then developed using an evolutionary algorithm. Unfortunately as the brief requires that the DEAP Python library is used, neuroevolution is not an available option as DEAP does not yet support it. While DEAP's open data structures and transparency allow for virtually any algorithm to be implemented, it will be easier far to use the built in structures.
 
 \subsubsection{Choice and Justification}
-Genetic Programming will be used as it most closely fits the aims set out in the introduction above. It intuitively maps to the problem, and will be the easiest to implement as the brief already contains a starter function set, which may be expanded, and a terminal set. A previous implementation of GP for snake is available online\cite{snake_blog}, this has been re-written in DEAP and slightly adapted to allow it to work with the available controls (up, down, left, right). Originally, this code was run with a population of 10,000 across 500 generations. Due to time constraints, this amount of computing was not feasible and needed to be considerably cut down. The final results have been generated using a population of 1000 across 75 generations, however the data for a full run of the control has been provided for completeness (Fig. \ref{table:population_size}). While the highly successful results from this original experiment could not be full reproduced, this new implementation gives a good baseline for judging further improvements. Any changes proposed in this report will be compared against this baseline in order to produce meaningful results. In order to avoid anomalous results caused by randomness, all results given are the mean result over 30 code runs.%TODO determine reasonable tolerance for generations AND population
+\label{justification}
+Genetic Programming will be used as it most closely fits the aims set out in the introduction above. It intuitively maps to the problem, and will be the easiest to implement as the brief already contains a starter function set, which may be expanded, and a terminal set. A previous implementation of GP for snake is available online\cite{snake_blog}, this has been re-written in DEAP and slightly adapted to allow it to work with the available controls (up, down, left, right). Originally, this code was run with a population of 10,000 across 500 generations. Due to time constraints, this amount of computing was not feasible and needed to be considerably cut down. A population of 1000 should be enough to evolve a reasonable Snake player and has a more reasonable runtime (Fig. \ref{fig:meanscore_v_runtime}). Experiments have shown that a population of 1000 should converge near a player in around 75 generations (Fig. \ref{fig:pop_convergence}). The data for a full run of the control has been provided for completeness to compare this implementation with the original paper (Fig. \ref{fig:control_fitness}). While the highly successful results from this original experiment could not be full reproduced, this new implementation gives a good baseline for judging further improvements. Any changes proposed in this report will be compared against this baseline in order to produce meaningful results.
+\\\\
+In order to avoid anomalous results caused by randomness, all results given are the mean result over 30 code runs. In general, the main measure used to compare individuals in this report will be their mean score on 500 games of the Snake once evolution is complete. This will give a fair representation of the real world performance of the individual. This measure is refered to as the `Mean Test Run Score' and will also averaged over 30 code runs.
 
 \subsubsection{Physical Environments}
 %MOVE THIS SECTION TO EVALUATION? ---------->>>
@@ -106,15 +118,14 @@ The terminal set uses the movement functions which, as previously mentioned, may
 \myparagraph{Function Set}
 %Which additional sensing functions (if any) have been implemented?
 Previous work has shown that the function set can help to find a better solution, however we need to be careful of overparameterising the problem. %cite for this
-This is a common trade-off in many forms of machine learning. In this case, experiments %TODO- RESULTS FOR THIS?
-and program analysis %TODO- show PROGRAM TREE
-showed that by replacing the snake's ability to sense its direction with a terminal that allows it to maintain its current course resulted in a significant score boost as well as a drop in the overall program size.% GRAPHS PLZ
-
+This is a common trade-off in many forms of machine learning. 
+\\\\
+While the brief limits new movement functions due to the way the game must be controlled by the player, taking no action is not strictly prohibited. In this case, both analysis of the program tree and practical experiments showed that by replacing the snake's ability to sense its direction with a terminal that allows it to maintain its current course resulted in a significant score boost without significant change in the program size (Table \ref{table:function_sets}).
 %Does the number of functions (primitives) affect the algorithm's performance?
 %CITATIONS?
 
 \subsection{Population}
-\subsubsection{Initialisation Procedure}
+\subsubsection{Initialisation}
 DEAP offers all of the three main initialisation methods used in genetic programming. The Full method initialises a program tree where every individual in the population is the same depth along every path. The grow method creates trees with nodes that terminate before the maximum height is reached. The final type of initialisation procedure, ramped half and half, creates half of the trees using the full method and half using the grow method. This is what will be used for this algorithm as it will provides the greatest diversity in initial population.
 
 \subsubsection{Size}
@@ -123,32 +134,33 @@ Having the correct population size is crucial to success\cite{dynamic_population
 \\\\
 %fixed size or not? <--- probably, but WHY?! "In almost all EA applications the population size is constant and does not change during the evolutionary search." - Textbook WHY WHY WHY WHY?!?!?!! - citation needed
 %easier to encode in an array? <- not if size of individuals might grow?
-In almost all EA applications the population size is constant\cite[p. 20]{textbook}
+In almost all EA applications the population size is constant\cite[p. 20]{textbook}. A number of recent papers have shown improved results when using dynamic population sizes\cite{eiben_dynamicpop, tan_dynamicpop}, but these have focused particularly on genetic algorithms rather than genetic programming. Furthermore, DEAP does not have explicit support for dynamic population sizes and attempting to use them would significantly complicate the implementation without any guarantee of improved results.
 %TALK ABOUT DYNAMIC population sizes in Spinosa \cite{dynamic_population_size}
 \\\\
 The algorithm was tested with varying population sizes to show the affect of this on the runtime and the fitness of the final individual produced. The algorithm was run 30 times for each population size, the runtime and fitness values for this are shown in Table \ref{table:population_size} and by Figure \ref{fig:pop_convergence}. After each run, the most fit individual was used to play 500 independent game, these results are shown in Table \ref{table:population_size} and by Figure \ref{fig:meanscore_v_runtime}. The runtime values only include the time used for evolution, not for testing the final individual.
 \\\\
 It is worth noting that the control has a mutation value of 0, so it requires that the initial population contains a reasonable distribution of good individuals. Adding mutation would allow novel ideas to be introduced later on in the evolution. This is likely why larger populations perform significantly better with this control algorithm and will be explored later in Section \ref{mutation}. Another interesting feature in the data is the significant increase in standard deviation as the population size increases. This shows that while larger populations help to produce individuals that perform better overall, this performance is not consistently across multiple games. This issue will be important to address later.
 \\\\
-The optimal size for the population is the size where a good solution is often produced but the program is quick to converge\cite{optimal_population_size}. A population of 1,000 seems to give a solution that is reasonably quick to converge (approx. 50 generations, Fig. \ref{fig:pop_convergence}) but also produces a reasonable score across multiple games (around 6.97, \ref{table:population_size}). This size of population will mean that proposed changes to the algorithm in this paper can be tested in a reasonable amount of time even with the limited timespan for the project and available computing resources.
+The optimal size for the population is the size where a good solution is often produced but the program is quick to converge\cite{optimal_population_size}. A population of 1,000 seems to give a solution that is reasonably quick to converge (approx. 50 generations, Fig. \ref{fig:pop_convergence}) but also produces a reasonable score across multiple games (around 6.97, Table \ref{table:population_size}). This size of population will mean that proposed changes to the algorithm in this paper can be tested in a reasonable amount of time even with the limited timespan for the project and available computing resources.
 
 \subsubsection{Diversity}
-Within this evolutionary computation task, each individual of the population corresponds to a point in the search space of all possible programs. Diversity corresponds to having these points reasonably spread out throughout this space. A diverse population is, by definition, covering more of this search space than one that is not. Ensuring a diverse population is important to allow the algorithm to explore several promising ... at once\cite{diversity_recommended}. Having a large enough population can contribute to having a good initial diversity, but diversity needs to also be maintained throughout the run of the algorithm to prevent premature convergence.
+Within this evolutionary computation task, each individual of the population corresponds to a point in the search space of all possible programs. Diversity corresponds to having these points reasonably spread out throughout this space. A diverse population is, by definition, covering more of this search space than one that is not. Ensuring a diverse population is important to allow the algorithm to explore several promising areas of this space at once\cite{diversity_recommended}. Having a large enough population can contribute to having a good initial diversity, but diversity needs to also be maintained throughout the run of the algorithm to prevent premature convergence. Diversity is difficult to measure directly but a range of different measures including the number of different fitness values, number of different phenotypes/genotypes or entropy may be used as a proxy for it in different situations\cite{textbook}. 
 %Can this be related back to k-nearest vs least-squares? Other machine learning problems
 
-\subsection{Evaluation}
+\subsection{Fitness Evaluation}
 \label{fitness_evaluation}
 %Multiple objectives?
 %keep snake alive
 %get more food!
 Implementing a good fitness evaluation function is essential to evolving a solution to this problem. Without this, there will be no way to assess individuals in order to determine which will survive and reproduce. There are two major objectives at play in the game, avoiding crashing the snake and getting to the food before the timer hits zero. These can be represented by the final size of the snake when the game ends, as if the snake crashes then the game ends and it is unable to get to the food and grow. Therefore, we can simply consider this a single-objective problem where the objective is produce the maximum length of snake before either the snake crashes or the timer hits zero. This significantly simplifies the problem with minimal impact.
 \\\\
-The snake's food spawns randomly around the board. This element of stochasticity makes evaluating the fitness of a particular solution more difficult. The fitness of a given algorithm will likely change between games and this has already shown by previous results, as mentioned in Section \ref{population_size}. In order to ensure a fairer representation of fitness, each solution may need to be evaluated across multiple games.
+The snake's food spawns randomly around the board. This element of stochasticity makes evaluating the fitness of a particular solution more difficult. The fitness of a given algorithm will likely change between games and this has already shown by previous results, as mentioned in Section \ref{population_size}. In order to ensure a fairer representation of fitness, each solution will be evaluated across multiple games. It should be noted that evaluating an individual over multiple games and using the cumulative score achieves a significantly greater average fitness, however it also significantly increases the runtime, which is not desirable.
 
 \myparagraph{Incentives}
 Certain scenarios in the game can lead to difficulties in evolving an individual that gets past a certain score. Rewarding individuals for making progress towards this, even if the score is not actually increased, can help to selectively breed programs that get past these boundaries. Likewise, punishing individuals that make obvious mistakes can also help to ensure they do not pass on these traits.
 \\\\
-A number of incentives and penalties have been employed to ensure maximum fitness:
+A number of incentives and penalties on individuals were considered:
+%The impact of a number of incentives and penalties on individuals have been evaluated:
 \begin{itemize}
 	\item Evaluating the fitness with multiple games, as described above will incentivise the snake to perform well generally rather than in only one particular fluke case.
 	\item Adding a significant penalty to the score for crashing into a wall will ensure individuals never take this choice.
@@ -156,73 +168,38 @@ A number of incentives and penalties have been employed to ensure maximum fitnes
 %TODO DETAIL.. how many games, how can we make this fair?
 %Is each point worth the same?
 	%do we want to incentivise consistently good scores or flukes?
-A number of different fitness functions were tested.
-Each of these have different benefits
-- factorial (single run), increasingly rewards higher scores
-- factorial (multiple runs), heavily rewards individuals which have a consistent high score
+%A number of different fitness functions were tested.
+%Each of these have different benefits
+%- factorial (single run), increasingly rewards higher scores
+%- factorial (multiple runs), heavily rewards individuals which have a consistent high score
 
 \subsection{Parent Selection}
+\label{selection}
 %How do we pick which individuals continue?
 Selecting which individuals should have influence over the next generation is one of the most important factors for success in Evolutionary Computing. If only the best individuals are selected then diversity will be lost, the algorithm will get stuck in a local minima and be unable to find a good general solution. This is known as premature convergence. If too many of the less-promising solutions are selected then the algorithm may be unstable meaning good solutions will take too long to find and may be lost quickly. Striking a good balance between a diverse population and a stable algorithm is necessary for finding a good solution in a reasonable time while preventing premature convergence.
 \\\\
-In biological evolution, old generations die to free up resources for newer generations.
-Disregarding solutions due to age ... %good or bad? diversity, other measures?
-
-% Losing good individuals? Hall of Fame/Elitism
-Parent Selection can be random, so (if this is the case) good solutions may well die out. Elitism can be used to ensure that the best solution isn't randomly removed from the population. If no better solution is ever found, this solution will want to be present in the final population once evolution is complete.
-%Does this have a positive/negative effect
-
-%Roulette Wheel vs Tournament
-
-\subsubsection{Maintaining Diversity}
-% Don't want to get stuck in a local optimum
-% Why is this a problem?
-%Textbook: 'Premature convergence is the well-known effect of losing population diversity too quickly and getting trapped in a local optimum.'
-Diversity is difficult to quantity in an objective manner and, as such, no single measure for it exists. A range of different measures including the number of different fitness values, number of different phenotypes/genotypes or entropy may be used\cite{textbook}.
-
-\myparagraph{Roulette Wheel}
-%description
-%Pros, cons
-
-\myparagraph{Tournament}
-\label{tournament}
-%description
-%pros, cons
+Parent Selection has an element of randomness, in order to model external factors that occur in biological evolution. This randomness means that good solutions might die out in order to make fresh solutions. In order to keep track of the best solutions seen so far, DEAP's Hall of Fame has been used. This will allow us to retrieve the most fit solution that has ever been present in the population once the algorithm finishes running. As we are only evaluating the most fit individual for each run, the Hall of Fame size can be set to 1, but this can be adjusted as desired. The two most common forms of parent selection are roulette wheel and tournament. In DEAP, roulette wheel cannot be used when fitness values may be 0, or when the algorithm is minimising, this is a significant limitation, so tournament will be used for this implementation.
 
 \subsubsection{Bloat}% How we work to prevent this,
 Bloat, the increase of the size of a genetic program without significant increase in fitness, is a difficult problem to overcome. Bloat is linked to, but different from, overfitting, a common problem in many forms of machine learning\cite{measuring_bloat}. The real aim here is to find the smallest possible program tree for a particular fitness.
 \\\\
 All forms of bloat control have been shown to work best when augmented with a form of tree depth limiting\cite{parsimony_pressure, bloat_comparison}. In this case, the program trees have been limited to a height of 8, a value decided using experimentation. Controlling bloat while maximising fitness turns the evolution into a multi-objective optimisation problem. The two most commonly used solutions to bloat are parsimony pressure and double tournaments. Parsimony pressure subtracts a value based on the size of the program tree from the individual's fitness. Traditional parsimony presure is parametric and therefore a model that specifies an exact trade-off between values of model and size is needed. This is difficult to produce as this value may not be known before runtime and may not be the same between different individuals\cite{parsimony_pressure}. 
-%\cite{parsimony_pressure}
 \\\\
-Double tournaments can be used for parent selection as an extension of regular tournament selection described in Section \ref{tournament}.
-It has been shown that the order of a double tournament has no significant bearing on the end result. [cite, practical?]%Several recent papers discuss this issue and propose methods for tackling it, parsimony pressure above and.. \cite{multi_objective_bloat}
-
+Double tournaments can be used for parent selection as an extension of regular tournament selection described in Section \ref{selection}. These are easier to parameterise as they do not require an exact known trade-off between program size and an individual's fitness. As such, double tournaments have been used to control bloat in this implementation. Experimentation was used to find reasonable values for the fitness tournament size and the size selection pressure. A static limit has also been used to limit the tree height to 7 nodes. Both of these values help to produce smaller program tress that have roughly equivalent fitness, as shown by Figure \ref{fig:bloat}. The order of a double tournament has been shown to have no significant effect\cite{parsimony_pressure}.%Several recent papers discuss this issue and propose methods for tackling it, parsimony pressure above and.. \cite{multi_objective_bloat}
 % Ongoing work into this may be interesting to talk about!
 
 \subsection{Variation Operators}
 % Describe how appropriate values for crossover and mutation were chosen to evolve the best agents,
 \subsubsection{Mutation}
 \label{mutation}
-Mutation is the operator which incorporates new ideas into the population. Without it, genes would only be shuffled around and no new solutions could be found. %why is this bad..
-%relate this to the search space..?
-A trade-off is required here, too much mutation will result in a highly unstable algorithm. Far too much mutation would %move this to calibration section perhaps?
-Care needs to be taken when implementing mutation so as not to create biases. This is particularly the case with real-valued mutation.. %which is not being used in this project?
-%How to prevent biases?
+Mutation is the operator which incorporates new ideas into the population. Without it, genes would only be shuffled around and no novel solutions could be found. If no mutation exists, the success of evolution relies entirely on the initial population containing the required genes to produce a good solution. %relate this to the search space..?
+Too much mutation, however, will result in a highly unstable algorithm, so a trade-off is required here. Care needs to be taken when implementing mutation so as not to create biases. This is particularly the case with real-valued mutation. As this implementation uses GP with no real-valued terminals, this will not be an issue here.
 
 \subsubsection{Crossover}
-%Crossover-
-%IF GA, is this fixed point crossover??
-
-%multipoint crossover, uniform crossover, no crossover?
-%cxOnePoint, cxTwoPoint, cxUniform, cxPartiallyMatched
+Crossover allows individuals to pass over parts of their genome to the future population. This is important so that two highly fit individuals can mix their genes with the aim of producing children which have an even higher fitness value. Out of the box, DEAP only supports one point-crossover for genetic programming. This should be suitable for this task. 
 
 \subsubsection{Calibration}
-Extensive experimentation (Fig. \ref{fig:calibration}) has shown that for this population size (1000), reasonably high values for both mutation and crossover tend to produce individuals that work best in the game. Particlularly good values appear to be produced when each value is 0.75, so this will be used.
-
-%Certain number of generations? - consistent across runs
-%Certain fitness level? - guarantees a good solution, cannot be guaranteed to terminate
-Certain number of generations..
+Extensive experimentation (Fig. \ref{fig:calibration}) has shown that for this population size (1000), reasonably high values for both mutation and crossover tend to produce individuals that work best in the game. Particlularly good values appear to be produced when each value is 0.75, so this will be used. As discussed in Section \ref{justification}, 75 generations seems to be enough for this population size to converge, so this will be our termination condition.
 
 \section{Results} %Results.. [35 marks]
 % Use your evolutionary algorithm to find as good a solution as possible. Evaluate your
@@ -232,25 +209,20 @@ Certain number of generations..
 %large numbers of runs can produce results that are significant but not important
 
 %In order to evaluate we need to compare it with a control
-While the control algorithm was originally intended to have a population of 10,000 and run for 500 generations, in order to make comparisons fair...
-In order to make these comparisons fair, both algorithms have been run with a population of 1000 across 75 generations.
+While the control algorithm was originally intended to have a population of 10,000 and run for 500 generations, in order to make the following comparisons fair both algorithms have been run with a population of 1,000 across 75 generations. However, as can be seen from Tables \ref{table:population_size} and \ref{table:final_results}, the final algorithm produces a better mean score with a population of 1,000 over 75 generations than the control did for a population of 10,000 over 250 generations.
 %designing controls can be difficult, they may be subject to: placebo effect & observer effect
 \myparagraph{Scoring}
-%USE A NULL HYPOTHESIS!!
-%Non-parametric tests DO NOT require a distribution to be normal and should be the default choice, rank sum test??
-A Wilcoxon rank sum test has been used to compare the scoring distribution for the new implementation, $S_N$, with the original control, $S_C$. This test is used as there is insufficient evidence to prove whether or not either of the distributions $S_N$ or $S_C$ are normal.
+While Figure \ref{fig:final_max_fitness} shows no significant change in overall maximum fitness of the individuals at any point in the evolution, the new implementation is being averaged over multiple games and therefore it must perform well consistently to achieve this score. These individuals are fitter overall, and hence when they reproduce, they pass their abilities along to the next generation, as shown by the mean fitness of the population in Figure \ref{fig:final_mean_fitness}. As such, the final algorithm proclaims a far greater final score in test games.
 \\\\
-The null hypothesis, $H_0$, states that the new algorithm produces results that are comparable to the control.
-\[H_0: S_N = S_C\]
+A Wilcoxon rank sum test has been used to compare the scoring distribution for the final implementation, $S_F$, with the original control, $S_C$. This test is used as there is insufficient evidence to prove whether or not either of the distributions $S_F$ or $S_C$ are normal.
+\\\\
+The null hypothesis, $H_0$, states that the new algorithm produces results that are comparable to the control as they are pulled from the same distribution.
+\[H_0: S_F = S_C\]
 Therefore, the alternative hypothesis is-
-\[H_1: S_N > S_C\]
+\[H_1: S_F > S_C\]
 
-We assume that $H_0$ is true. If the probability that $H_0$ is true, $p(H_0) < 0.05$, then there is sufficient evidence to reject the null hypothesis.
+We assume that $H_0$ is true and attempt to disprove this using the Mann-Whitney U test. The Mann-Whitney U test is significant if $u$ is less than the critical value $U$, which is 317 for two sample sizes of 30, and if the probability that $H_0$ is true, $p(H_0) < 0.05$. The test returns a $u$ value of 47 and a $p$ value of $2.67 \times 10^{-9}$. Therefore there is sufficient evidence to reject null hypothesis.
 
-\myparagraph{Runtime}
-Significant savings were also made on the runtime by developing an algorithm that produced good results even with a small population and limited number of generations. These is sufficient evidence to prove that runtime has been significantly sped up using runtime distributions, $T_N$ and $T_C$ for the new implementation and control, respectively.
-\[H_0: T_N = T_C\]
-\[H_1: T_N > T_C\]
 %SEE Discovering Statistics using R
 %SEE paper: Lecture 4 reading, A Practical Guide for Using Statistical Tests to Assess Randomized Algorithms in Software Testing
 
@@ -263,12 +235,10 @@ Significant savings were also made on the runtime by developing an algorithm tha
 % Connects well with the literature and provides relevant references
 % Demonstrates critical ability
 % Provides good suggestions for future work
-
-
+This report has detailed the major trade-offs involved in evolving a controller for Snake, especially that of performance against runtime. The design decisions taken here have been justified within the context of the task- a short term university assessment for demonstrating knowledge of Evolutionary Computing. As part of this, having a reasonable runtime was a key requirement in order to perform all the necessary testing within the allocated time. Given this significant constraint, various parameters including mutation/crossover probability and population size have been calibrated in order to produce an algorithm that offers a reasonable performance. Statistics has been produced and included that will allow for easy re-calibration of the algorithm for their own requirements and compute availability.
+\\\\
 %COMPARE to existing Blog and Paper snake solutions?
-
-%Has DEAP proved a good tool for this task?
-%pros/cons?
+DEAP has given a large amount of flexibility to the project and ensured that commonly used genetic programming features need not be re-implemented. However, it has provided some limitations. It does not have support for several aspects of Evolutionary Computing that have been discussed in this paper, such as neuroevolution and dynamic population size. These could be considered as future enhancements to the framework.
 
 \subsection{Further Work}
 The complexity and diversity of the snake game can lead into plenty of areas for further exploration. Recent developments in evolutionary computation such as co-evolution and neuroevolution could be explored in the context of this task. With co-evolution individuals would have to compete in order to get to the food items first, creating snake players that find the food faster.
@@ -278,27 +248,27 @@ Alternative approaches to this problem are a promising avenue for future explora
 Future work could also explore the adaptability of this program to perform well across the wide number of variants of the game that exist with different formats and rules. This could be further expanded to attempt to create individuals that generalise across multiple game variants and carry their learning across in the way a human player would.
 
 \newpage
-\raggedright
+%\raggedright
 \bibliography{Report}{}
 \bibliographystyle{ieeetran}
 
 \newpage
 \section{Appendix}
 
-\begin{table}[h]
+\begin{table}[ht]
 \begin{center}
-\begin{tabular}{|l|l|l|l|r|}
+\begin{tabular}{|l|l|r|l|r|}
 \hline%Add time taken?
 \textbf{Population Size} & \multicolumn{2}{c|}{\textbf{Run Time}} & \multicolumn{2}{c|}{\textbf{Mean Test Run Score}} \\
 \hline
 \multirow{3}{*}{100}
 & Mean & 6.59 & Mean & 2.76 \\
-& Max & 13.5 & Max & 11.60 \\
+& Max & 13.50 & Max & 11.60 \\
 & St.Dev & 2.52 & St.Dev & 2.14 \\
 \hline
 \multirow{3}{*}{250}
-& Mean & 17.7 & Mean & 4.67 \\
-& Max & 28.9 & Max & 18.8 \\
+& Mean & 17.70 & Mean & 4.67 \\
+& Max & 28.90 & Max & 18.8 \\
 & St.Dev & 4.22 & St.Dev & 3.48 \\
 \hline
 \multirow{3}{*}{500}
@@ -307,8 +277,8 @@ Future work could also explore the adaptability of this program to perform well 
 & St.Dev & 18.55 & St.Dev & 3.99 \\
 \hline
 \multirow{3}{*}{750}
-& Mean & 66.5 & Mean & 7.31 \\
-& Max & 252.96 & Max & 23.9 \\
+& Mean & 66.50 & Mean & 7.31 \\
+& Max & 252.96 & Max & 23.90 \\
 & St.Dev & 38.66 & St.Dev & 4.46 \\
 \hline
 \multirow{3}{*}{1000}
@@ -328,13 +298,58 @@ Future work could also explore the adaptability of this program to perform well 
 \hline
 \multirow{3}{*}{10000}
 & Mean & 1437.17 & Mean & 18.0 \\
-& Max & 39.27 & Max & 39.3 \\
+& Max & 39.27 & Max & 39.30 \\
 & St.Dev & 7.59 & St.Dev & 7.59 \\
 \hline
 \end{tabular}
 \end{center}
 \caption{Population Size Performance over 250 Generations}
 \label{table:population_size}
+\end{table}
+
+
+\begin{table}[ht]
+\begin{center}
+\begin{tabular}{|c|l|r|l|r|}
+\hline%Add time taken?
+\textbf{Description} & \multicolumn{2}{c|}{\textbf{Mean Test Run Score}} & \multicolumn{2}{c|}{\textbf{Program Size}} \\
+\hline
+\multirow{3}{*}{Control Function Set}
+& Mean & 6.58 & Mean & 44.80 \\
+& Max & 24.00 & Max & 97.00 \\
+& St.Dev & 4.61 & St.Dev & 16.75 \\
+\hline
+\multirow{3}{*}{\makecell{Removed Direction Check,\\Added Maintain Course}}
+& Mean & 13.97 & Mean & 48.73 \\
+& Max & 33.23 & Max & 79.00 \\
+& St.Dev & 6.72 & St.Dev & 12.71 \\
+\hline
+\end{tabular}
+\end{center}
+\caption{Comparison on different function sets}
+\label{table:function_sets}
+\end{table}
+
+\begin{table}[ht]
+\begin{center}
+\begin{tabular}{|c|l|r|l|r|}
+\hline%Add time taken?
+\textbf{Description} & \multicolumn{2}{c|}{\textbf{Run Time}} & \multicolumn{2}{c|}{\textbf{Mean Test Run Score}} \\
+\hline
+\multirow{3}{*}{Control}
+& Mean & 16.99 & Mean & 5.68 \\
+& Max & 22.90 & Max & 45.00 \\
+& St.Dev & 3.02 & St.Dev & 4.04 \\
+\hline
+\multirow{3}{*}{Final}
+& Mean & 89.48 & Mean & 14.45 \\
+& Max & 198.20 & Max & 46.00 \\
+& St.Dev & 39.97 & St.Dev & 6.51 \\
+\hline
+\end{tabular}
+\end{center}
+\caption{Performance of the Control and Final Algorithm}
+\label{table:final_results}
 \end{table}
 
 \begin{figure}[ht]
@@ -356,6 +371,14 @@ Future work could also explore the adaptability of this program to perform well 
 
 \begin{figure}[ht]
 \centering
+\includegraphics[width=1\textwidth]{Figures/control_fitness}
+\caption{Control Evolution (10,000 Population)}
+\label{fig:control_fitness}
+\end{figure}
+
+
+\begin{figure}[ht]
+\centering
 \begin{subfigure}{0.5\textwidth}
 \centering
 \includegraphics[width=1\textwidth]{Figures/convergence}
@@ -373,6 +396,26 @@ Future work could also explore the adaptability of this program to perform well 
 \label{fig:varying_population_size}
 \end{figure}
 
+\begin{figure}[ht]
+
+\centering
+\begin{subfigure}{1\textwidth}
+\centering
+\includegraphics[width=0.8\textwidth]{Figures/bloat_control}
+\caption{Double Tournament}
+\label{fig:bloat_control}
+\end{subfigure}
+\begin{subfigure}{1\textwidth}
+\centering
+\includegraphics[width=0.8\textwidth]{Figures/height_limit_only}
+\caption{Height Limit (increased to 9) Only}
+\label{fig:height_limit_only}
+\end{subfigure}
+
+\caption{How bloat affects Program Trees}
+\label{fig:bloat}
+\end{figure}
+
 
 \begin{figure}[ht]
 \centering
@@ -387,18 +430,39 @@ Future work could also explore the adaptability of this program to perform well 
 \centering
 \begin{subfigure}{0.5\textwidth}
 \centering
-\includegraphics[width=1\textwidth]{Figures/control_fitness}
-\caption{Control}
-\label{fig:control_fitness}
+\includegraphics[width=1\textwidth]{Figures/result_mean}
+\caption{Mean Fitness}
+\label{fig:final_mean_fitness}
 \end{subfigure}%
 \begin{subfigure}{0.5\textwidth}
 \centering
-\includegraphics[width=1\textwidth]{Figures/final_fitness}
-\caption{Final Algorithm}
-\label{fig:final_fitness}
+\includegraphics[width=1\textwidth]{Figures/result_max}
+\caption{Max Fitness}
+\label{fig:final_max_fitness}
 \end{subfigure}
 
-\caption{Fitness of final algorithms.}
+\begin{subfigure}{0.5\textwidth}
+\centering
+\includegraphics[width=1\textwidth]{Figures/control_hist}
+\caption{Control Test Run Score Distribution}
+\label{fig:control_hist}
+\end{subfigure}%
+\begin{subfigure}{0.5\textwidth}
+\centering
+\includegraphics[width=1\textwidth]{Figures/final_hist}
+\caption{Final Test Run Score Distribution}
+\label{fig:final_hist}
+\end{subfigure}
+
+\begin{subfigure}{0.5\textwidth}
+\centering
+\includegraphics[width=1\textwidth]{Figures/box_plot}
+\caption{Test Run Scores}
+\label{fig:final_box_plot}
+\end{subfigure}
+
+
+\caption{Control and Final Algorithm}
 \label{fig:fitness_comparison}
 \end{figure}
 
